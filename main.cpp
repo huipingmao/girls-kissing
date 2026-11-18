@@ -247,6 +247,7 @@ public:
 		// if (animation_time <= 0) { animation_time = 60;}
 		// else animation_time--;
 
+		animation_time -= speed;
 		if (animation_time <= 0) animation_frame++;
 		if (animation_frame < from || animation_frame > to) { 
 			animation_frame = from; 
@@ -254,7 +255,6 @@ public:
 		}
 		else if (animation_time > 0) return;
 
-		animation_time -= speed;
 	};
 };
 
@@ -263,14 +263,24 @@ int frame = 0;
 int main ()
 {
 	InitWindow(1000, 800, "girls kissing gaem");
+	InitAudioDevice();
 	SetTargetFPS(240);
 
 	Font mona = LoadFontEx("resources/MonaspaceRadonFrozen-Regular.ttf", 20, 0, 250);
 	// Texture2D girls_kissing = LoadTexture("resources/sprites/bokita.png");
 	Texture2D kita_idle = LoadTexture("resources/sprites/kita-all.png");
 	Texture2D nijika = LoadTexture("resources/sprites/nijika.gif");
-	Texture2D grass = LoadTexture("resources/sprites/grass2.png");
+	Texture2D grass = LoadTexture("resources/sprites/grass.png");
 	Texture2D tree = LoadTexture("resources/sprites/tree.png");
+	Texture2D sunflower = LoadTexture("resources/sprites/sunflower.png");
+
+	Sound sound[5] = {0};
+	sound[0] = LoadSound("resources/sfx/21_3.mp3");
+	sound[1] = LoadSound("resources/sfx/bamboo-hit-sound-effect.mp3");
+	sound[2] = LoadSound("resources/sfx/half-life-button.mp3");
+	sound[3] = LoadSound("resources/sfx/erro-win-7_3OFHeWK.mp3");
+	sound[4] = LoadSound("resources/sfx/fairy-dust-sfx.mp3");
+	SetMasterVolume(0.2);
 
 	Camera2D camera = {0};
 
@@ -323,7 +333,10 @@ int main ()
 
 		frame++;
 
-		if (IsKeyPressed(KEY_Q)) CloseWindow();
+		if (IsKeyPressed(KEY_Q)) { 
+			CloseWindow();
+			CloseAudioDevice();
+		}
 		if (IsKeyPressed(KEY_R)) { player.pos.x = 700; player.pos.y = 100;
 							 player.prev_pos.x = 700; player.prev_pos.y = 100; }
 
@@ -412,7 +425,9 @@ int main ()
 					) 
 					{ return a.second < b.second; }
 			);
-			if (!possible_collisions_list.empty()) { std::cout << possible_collisions_list[0].first << "\n"; platforms[possible_collisions_list[0].first].color = RED; }
+			// if (!possible_collisions_list.empty()) { 
+			// 	std::cout << possible_collisions_list[0].first << "\n"; platforms[possible_collisions_list[0].first].color = RED;
+			// }
 			// printf("size of possible_collisions_list: %d\n", size(possible_collisions_list));
 			// std::cout << possible_collisions_list.front() << "\n";
 			// std::cout << "bocchi kita" << "\n";
@@ -433,10 +448,13 @@ int main ()
 		if (IsKeyDown(KEY_SPACE) && player.is_grounded && player.can_jump) { 
 			player.jump(); player.is_grounded = false; player.coyote = 0; 
 			if (player.facing == 'r') player.animation_frame = 2;
+			PlaySound(sound[std::rand() % (0 - 5)]);
 			// else player.animation_frame = 3;
 		} else if (IsKeyDown(KEY_SPACE) && player.coyote && player.can_jump) { 
 			player.jump(); player.is_grounded = false; player.coyote = 0;
 			if (player.facing == 'r') player.animation_frame = 2;
+			PlaySound(sound[std::rand() % (0 - 5)]);
+			// PlaySound(sound);
 			// else player.animation_frame = 3;
 		}
 
@@ -458,17 +476,23 @@ int main ()
 		// ClearBackground(Color{0x11, 0x00, 0x11, 0xff});
 		ClearBackground(Color{0xa5, 0xc2, 0xd6, 0xff});
 
-		DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {100, 530, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, 0, WHITE);
-		DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {180, 530, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, 0, WHITE);
-		DrawRectangleRec(player.scanbox, Color{0x00, 0xcc, 0x00, 0x44});
-		DrawRectangleRec(player.hurtbox, Color{0xcc, 0x00, 0x00, 0x88});
+		DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {100, 530, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, -2, WHITE);
+		DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {180, 535, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, 3, WHITE);
+		DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {300, 570, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, -1, WHITE);
+		DrawTexturePro(sunflower, (Rectangle) {0, 0, 802, 980}, (Rectangle) {280, 660, 802 / 20, 980 / 20}, (Vector2) {0, 0}, 3, WHITE);
+		DrawTexturePro(sunflower, (Rectangle) {0, 0, 802, 980}, (Rectangle) {200, 670, 802 / 20, 980 / 20}, (Vector2) {0, 0}, -12, WHITE);
+		DrawTexturePro(sunflower, (Rectangle) {0, 0, 802, 980}, (Rectangle) {160, 672, 802 / 20, 980 / 20}, (Vector2) {0, 0}, 1, WHITE);
+		DrawTexturePro(sunflower, (Rectangle) {0, 0, 802, 980}, (Rectangle) {180, 660, 802 / 20, 980 / 20}, (Vector2) {0, 0}, 8, WHITE);
+
+		// DrawRectangleRec(player.scanbox, Color{0x00, 0xcc, 0x00, 0x44});
+		// DrawRectangleRec(player.hurtbox, Color{0xcc, 0x00, 0x00, 0x88});
 
 
 		// DrawTexturePro(player.texture, (Rectangle) {150, 200, player.hitbox.width * 4, player.hitbox.height * 4}, player.hitbox, (Vector2) {0, 0}, 0, WHITE);
 		// DrawTexturePro(player.texture, (Rectangle) {0, 0, 347, 347}, player.hitbox, (Vector2) {0, 0}, 0, WHITE);
 
 
-		if (player.animation_time <= 0) { player.animation_time = 60;}
+		if (player.animation_time <= 0) { player.animation_time = 80;}
 		else player.animation_time--;	
 		if (player.x_vel != 0 && player.y_vel >= 0) {
 			if (player.facing == 'r') player.animate_from_to_frame(4, 7, 1);
@@ -492,7 +516,8 @@ int main ()
 		// DrawLineV((Vector2){player.pos.x + player.hitbox.width, player.pos.y + player.hitbox.height}, (Vector2){player.pos.x + player.hitbox.width + player.x_vel, player.pos.y + player.hitbox.height + player.y_vel}, RED);
 		// DrawLineV((Vector2){player.pos.x + player.hitbox.width, player.pos.y}, (Vector2){player.pos.x + player.hitbox.width + player.x_vel, player.pos.y + player.y_vel}, RED);
 		// DrawLineV((Vector2){player.pos.x, player.pos.y + player.hitbox.height}, (Vector2){player.pos.x + player.x_vel, player.pos.y + player.hitbox.height + player.y_vel}, RED);
-		DrawLineV((Vector2){player.pos.x + player.hitbox.width / 2, player.pos.y + player.hitbox.height / 2}, (Vector2){player.pos.x + player.hitbox.width / 2 +  player.x_vel, player.pos.y + player.hitbox.height / 2 + player.y_vel}, RED);
+ 
+		// DrawLineV((Vector2){player.pos.x + player.hitbox.width / 2, player.pos.y + player.hitbox.height / 2}, (Vector2){player.pos.x + player.hitbox.width / 2 +  player.x_vel, player.pos.y + player.hitbox.height / 2 + player.y_vel}, RED);
 
 		EndMode2D();
 
@@ -509,8 +534,8 @@ int main ()
 
 		EndDrawing();
 
-		// printf("x vel: %f y vel: %f facing: %c\n", player.x_vel, player.y_vel, player.facing);
-		// printf("x: %f y: %f\n", player.x, player.y);
+		printf("\n\n\n\nx vel: %f y vel: %f facing: %c\n", player.x_vel, player.y_vel, player.facing);
+		printf("x: %f y: %f\n", player.pos.x, player.pos.y);
 		// printf("x hitbox: %f y hitbox: %f\n", player.hitbox.x, player.hitbox.y);
 		// printf("is jump: %d in air: %d\n", player.is_jump, player.in_air);
 		// printf("is grounded: %d\n", player.is_grounded);
