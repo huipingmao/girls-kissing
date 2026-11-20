@@ -3,6 +3,12 @@
 #include <raylib.h>
 #include <vector>
 #include <algorithm>
+#include <fstream>
+#include <cstdio>
+
+// typedef struct {
+// 	std::vector<Platform> platforms;
+// } Level;
 
 bool is_in_range (int a1, int a2, int b1, int b2)
 {
@@ -43,24 +49,36 @@ public:
 	};
 };
 
-	// Player player = (Player) {
-	// 	// .pos = Vector2 {700, 100},
-	// 	.pos = Vector2 {100, 100},
-	// 	.prev_pos = Vector2 {player.pos.x, player.pos.y},
-	// 	.x_vel = 0,
-	// 	.y_vel = 0,
-	// 	.health = 3,
-	// 	.coyote = 0,
-	// 	.in_air = false,
-	// 	.is_grounded = false,
-	// 	.is_jump = true,
-	// 	.can_jump = true,
-	// 	.facing = 'l',
-	// 	.hitbox = (Rectangle) {player.pos.x, player.pos.y, 50, 100},
-	// 	.hurtbox = (Rectangle) {player.pos.x, player.pos.y, 0, 0},
-	// 	// .texture = girls_kissing,
-	// 	.texture = nijika,
-	// };
+void read_level_file (char *file_path, std::vector<Platform> *platforms)
+{
+	// std::ifstream f(file_path);
+	FILE *f = fopen(file_path ,"r");
+	// char ch;
+	Rectangle tmp = {0};
+
+	char sign = fgetc(f);
+	while (sign != EOF) {
+		if (sign == '{') {
+			fscanf(f, "%f, %f, %f, %f}\n", &tmp.x, &tmp.y, &tmp.width, &tmp.height);
+			platforms->push_back((Platform){(Vector2){0, 0}, tmp, NULL});
+			puts ("%%\t\tINFO\t\t%% added platform");
+		}
+		// if (sign == '\n') sign = fgetc(f);
+		sign = fgetc(f);
+	}
+	// while (f.get(ch)) {
+	// 	if (ch == '{') {
+	// 		tmp = {0};
+	// 	} else if (ch == '}') {
+	// 		platforms.push_back();
+	// 	} else if (std::isdigit(ch));
+	// 	else if (ch == ',');
+	// 	else;
+	// 	// std::cout << ch;
+	// }
+	fclose(f);
+
+}
 
 class Player {
 private:
@@ -122,23 +140,13 @@ public:
 
 	void gravity ()
 	{
-		// #define MAXSPEED 1200
-		// #define MAXSPEED 800
-		// #define MAXSPEED 1800
-		// #define ACCELERATION 20
-		// #define MAXSPEED 3
-		// #define ACCELERATION 0.1
-
 		if (y_vel < gravity_max) y_vel += gravity_accel;
 		else y_vel = gravity_max;
 
-		// #undef MAXSPEED
-		// #undef ACCELERATION
 	};
 
 	void jump () 
 	{
-		// y_vel -= 1400;
 		y_vel -= jump_height;
 		can_jump = false;
 		in_air = true;
@@ -146,12 +154,6 @@ public:
 
 	void move_left_right (char dir)
 	{
-		// #define RUN_MAXSPEED 500
-		// #define RUN_MAXSPEED 9000
-		// #define RUN_ACCELERATION 100
-		// int maxspeed = 500;
-		// int acceleration = 1000;
- 
 		switch (dir) {
 			case 'r':
 				if (x_vel < 0) x_vel += acceleration * 2;
@@ -186,64 +188,64 @@ public:
 		if (x_vel < -max_speed) x_vel = -max_speed;
 	};
 
-	bool cool_collision_detection (Platform *platform)
-	{
-		if (CheckCollisionRecs(hitbox, platform->hitbox)) {
+	// bool cool_collision_detection (Platform *platform)
+	// {
+	// 	if (CheckCollisionRecs(hitbox, platform->hitbox)) {
 
-			bool is_in_range_of_x = true;
+	// 		bool is_in_range_of_x = true;
 
-			if (
-				platform->hitbox.x > prev_pos.x
-				&&
-				platform->hitbox.x > prev_pos.x + hitbox.width
-				||
-				platform->hitbox.x + platform->hitbox.width < prev_pos.x
-				&&
-				platform->hitbox.x  + platform->hitbox.width < prev_pos.x + hitbox.width
-			) // 2 trivial cases where both points of a platform cannot be in x range of rectangle 
-				{ is_in_range_of_x = false; /* puts("isnt in range"); */ };
+	// 		if (
+	// 			platform->hitbox.x > prev_pos.x
+	// 			&&
+	// 			platform->hitbox.x > prev_pos.x + hitbox.width
+	// 			||
+	// 			platform->hitbox.x + platform->hitbox.width < prev_pos.x
+	// 			&&
+	// 			platform->hitbox.x  + platform->hitbox.width < prev_pos.x + hitbox.width
+	// 		) // 2 trivial cases where both points of a platform cannot be in x range of rectangle 
+	// 			{ is_in_range_of_x = false; /* puts("isnt in range"); */ };
 
-			if (is_in_range_of_x) {
-				if (pos.y > prev_pos.y) { // from the top
-					pos.y = prev_pos.y;
-					// pos.y = platform->hitbox.y - hitbox.height - 0.01;
-					y_vel = 0;
-					// y_vel = -y_vel/1.3;
-					is_grounded = true;
-				}
+	// 		if (is_in_range_of_x) {
+	// 			if (pos.y > prev_pos.y) { // from the top
+	// 				pos.y = prev_pos.y;
+	// 				// pos.y = platform->hitbox.y - hitbox.height - 0.01;
+	// 				y_vel = 0;
+	// 				// y_vel = -y_vel/1.3;
+	// 				is_grounded = true;
+	// 			}
 
-				if (pos.y < prev_pos.y) { // from below
-					pos.y = prev_pos.y;
-					// pos.y = platform->hitbox.y + platform->hitbox.height + 0.01;
-					y_vel = 0;
-					return true;
-				}
-			}
+	// 			if (pos.y < prev_pos.y) { // from below
+	// 				pos.y = prev_pos.y;
+	// 				// pos.y = platform->hitbox.y + platform->hitbox.height + 0.01;
+	// 				y_vel = 0;
+	// 				return true;
+	// 			}
+	// 		}
 
-			if (pos.y + hitbox.height > platform->hitbox.y && pos.y < platform->hitbox.y + platform->hitbox.height) { // check for x collisions when isnt atop platforms y axis and isnt below platforms y axis
-				// if (pos.x != prev_pos.x) { // both dirs
-				// 	pos.x = prev_pos.x;
-				// 	x_vel = 0;
-				// }
-				if (pos.x > prev_pos.x) {
-					// pos.x = platform->hitbox.x - hitbox.width - 0.01;
-					// pos.x = platform->hitbox.x - hitbox.width;
-					pos.x = prev_pos.x;
-					x_vel = 0;
-					// x_vel = -x_vel;
-				}
-				else if (pos.x < prev_pos.x) {
-					// pos.x = platform->hitbox.x + platform->hitbox.width + 0.01;
-					// pos.x = platform->hitbox.x + platform->hitbox.width;
-					pos.x = prev_pos.x;
-					x_vel = 0;
-					// x_vel = -x_vel;
-				}
-			}
-			return true;
-		}
-		return false;
-	};
+	// 		if (pos.y + hitbox.height > platform->hitbox.y && pos.y < platform->hitbox.y + platform->hitbox.height) { // check for x collisions when isnt atop platforms y axis and isnt below platforms y axis
+	// 			// if (pos.x != prev_pos.x) { // both dirs
+	// 			// 	pos.x = prev_pos.x;
+	// 			// 	x_vel = 0;
+	// 			// }
+	// 			if (pos.x > prev_pos.x) {
+	// 				// pos.x = platform->hitbox.x - hitbox.width - 0.01;
+	// 				// pos.x = platform->hitbox.x - hitbox.width;
+	// 				pos.x = prev_pos.x;
+	// 				x_vel = 0;
+	// 				// x_vel = -x_vel;
+	// 			}
+	// 			else if (pos.x < prev_pos.x) {
+	// 				// pos.x = platform->hitbox.x + platform->hitbox.width + 0.01;
+	// 				// pos.x = platform->hitbox.x + platform->hitbox.width;
+	// 				pos.x = prev_pos.x;
+	// 				x_vel = 0;
+	// 				// x_vel = -x_vel;
+	// 			}
+	// 		}
+	// 		return true;
+	// 	}
+	// 	return false;
+	// };
 
 	bool collision_resolution_v2 (Platform *platform) {
 		if (CheckCollisionRecs(hitbox, platform->hitbox)) {
@@ -252,7 +254,8 @@ public:
 			// a1 > b2
 			// a2 < b1
 			// a2 < b2
- 
+
+			// ts function broken xd
 			// bool within_x = is_in_range(
 			// 	platform->hitbox.x,
 			// 	platform->hitbox.x + platform->hitbox.width,
@@ -302,17 +305,10 @@ public:
 		float platform_x_right = p->hitbox.x + p->hitbox.width;
 		float player_x = pos.x + hitbox.width / 2;
 		float player_y = pos.y + hitbox.height / 2;
-		// float player_y_left = prev_pos.y;
-		// float player_y_right = prev_pos.y + hitbox.width;
-		// float player_x_left = prev_pos.x;
-		// float player_x_right = prev_pos.x + hitbox.width;
 
 		float dx = std::max({0.0f, (platform_x_left - player_x), (player_x - platform_x_right)});
 		float dy = std::max({0.0f, (platform_y_top - player_y), (player_y - platform_y_bottom)});
-		// float dx = std::max({0.0f, (platform_x_left - player_x_right), (player_x_left - platform_x_right)});
-		// float dy = std::max({0.0f, (platform_y_left - player_y_right), (player_y_left - platform_y_right)});
 
-		// printf("distance from player = %f\n", sqrt(dx*dx + dy*dy));
 		return std::sqrt(dx*dx + dy*dy);
 
 	}
@@ -365,6 +361,7 @@ int main ()
 	InitAudioDevice();
 	SetTargetFPS(240);
 
+
 	Font mona = LoadFontEx("resources/MonaspaceRadonFrozen-Regular.ttf", 20, 0, 250);
 	// Texture2D girls_kissing = LoadTexture("resources/sprites/bokita.png");
 	Texture2D kita_idle = LoadTexture("resources/sprites/kita-all.png");
@@ -373,13 +370,14 @@ int main ()
 	Texture2D tree = LoadTexture("resources/sprites/tree.png");
 	Texture2D sunflower = LoadTexture("resources/sprites/sunflower.png");
 
-	Sound sound[5] = {0};
-	sound[0] = LoadSound("resources/sfx/stereotypical-japanese-pop.mp3");
+	// Sound sound[5] = {0};
+	// sound[0] = LoadSound("resources/sfx/stereotypical-japanese-pop.mp3");
 	// sound[0] = LoadSound("resources/sfx/21_3.mp3");
 	// sound[1] = LoadSound("resources/sfx/bamboo-hit-sound-effect.mp3");
 	// sound[2] = LoadSound("resources/sfx/half-life-button.mp3");
 	// sound[3] = LoadSound("resources/sfx/erro-win-7_3OFHeWK.mp3");
 	// sound[4] = LoadSound("resources/sfx/fairy-dust-sfx.mp3");
+	Sound sound = LoadSound("resources/sfx/half-life-crowbar.mp3");
 	SetMasterVolume(0.02);
 
 	Camera2D camera = {0};
@@ -388,28 +386,31 @@ int main ()
 	player.texture = kita_idle;
 
 	std::vector<Platform> platforms;
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){800, 300, 300, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){300, 450, 300, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 600, 300, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 250, 30, 300}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 700, 300, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 600, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 610, 30, 30}, nijika});
-	// platforms.push_back({(Vector2) {0, 0}, (Platform)(Rectangle){80, 601, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 500, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 550, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 300, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){320, 200, 30, 300}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 730, 9900, 10}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1200, 600, 200, 10}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1400, 600, 200, 10}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1620, 600, 200, 10}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){4000, 200, 5, 1000}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2000, 600, 300, 20}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2100, 600, 300, 20}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2200, 600, 300, 20}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2500, 600, 300, 20}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){240, 600, 30, 30}, nijika});
+
+	read_level_file("./level-0", &platforms);
+
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){800, 300, 300, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){300, 450, 300, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 600, 300, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 250, 30, 300}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 700, 300, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 600, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 610, 30, 30}, nijika});
+	// // platforms.push_back({(Vector2) {0, 0}, (Platform)(Rectangle){80, 601, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 500, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 550, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 300, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){320, 200, 30, 300}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 730, 9900, 10}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1200, 600, 200, 10}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1400, 600, 200, 10}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1620, 600, 200, 10}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){4000, 200, 5, 1000}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2000, 600, 300, 20}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2100, 600, 300, 20}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2200, 600, 300, 20}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2500, 600, 300, 20}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){240, 600, 30, 30}, nijika});
 
 	float camera_x_follow = player.pos.x + player.hitbox.width / 2;
 	float camera_y_follow = player.pos.y + player.hitbox.height / 2;
@@ -492,15 +493,9 @@ int main ()
 			// PlaySound(sound[2]);
 			// PlaySound(sound[4]);
 			// PlaySound(sound[0]);
+			// PlaySound(sound);
 			player.gravity_accel = 0;
 		}
-		// } else if (IsKeyDown(KEY_SPACE) && player.coyote && player.can_jump) { 
-		// 	player.jump(); player.is_grounded = false; player.coyote = 0;
-		// 	if (player.facing == 'r') player.animation_frame = 2;
-		// 	// PlaySound(sound[std::rand() % (0 - 5)]);
-		// 	PlaySound(sound[1]);
-		// 	// else player.animation_frame = 3;
-		// }
 
 		player.move_left_right(dir);
 
@@ -545,11 +540,6 @@ int main ()
 
 		// DrawRectangleRec(player.scanbox, Color{0x00, 0xcc, 0x00, 0x44});
 		// DrawRectangleRec(player.hurtbox, Color{0xcc, 0x00, 0x00, 0x88});
-
-
-		// DrawTexturePro(player.texture, (Rectangle) {150, 200, player.hitbox.width * 4, player.hitbox.height * 4}, player.hitbox, (Vector2) {0, 0}, 0, WHITE);
-		// DrawTexturePro(player.texture, (Rectangle) {0, 0, 347, 347}, player.hitbox, (Vector2) {0, 0}, 0, WHITE);
-
 
 		if (player.animation_time <= 0) { player.animation_time = 80;}
 		else player.animation_time--;	
@@ -602,9 +592,9 @@ int main ()
 
 		EndDrawing();
 
-		printf("\n\n\n\nx vel: %f y vel: %f facing: %c\n", player.x_vel, player.y_vel, player.facing);
-		printf("prev x: %f prev y: %f\n", player.prev_pos.x, player.prev_pos.y);
-		printf("x: %f y: %f\n", player.pos.x, player.pos.y);
+		// printf("\n\n\n\nx vel: %f y vel: %f facing: %c\n", player.x_vel, player.y_vel, player.facing);
+		// printf("prev x: %f prev y: %f\n", player.prev_pos.x, player.prev_pos.y);
+		// printf("x: %f y: %f\n", player.pos.x, player.pos.y);
 		// printf("x hitbox: %f y hitbox: %f\n", player.hitbox.x, player.hitbox.y);
 		// printf("is jump: %d in air: %d\n", player.is_jump, player.in_air);
 		// printf("is grounded: %d\n", player.is_grounded);
