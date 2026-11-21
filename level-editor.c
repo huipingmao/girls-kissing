@@ -73,51 +73,84 @@ void free_rectangles ()
 	all_recs.capacity = 0;
 }
 
+Camera2D camera = {0};
+
 Vector2 mouse_init_pos;
 Rectangle new = {0};
 
 void draw_new_rectangle (Rectangle *rec_to_add)
 {
+	Vector2 mouse_pos = GetScreenToWorld2D(GetMousePosition(), camera);
+	printf("x mp %f y mp %f\n", mouse_pos.x, mouse_pos.y);
+
 	DrawRectangleRec(*rec_to_add, (Color){0x22, 0x77, 0x22, 0xcc});
 	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-		mouse_init_pos = GetMousePosition();
+		// mouse_init_pos = GetMousePosition();
+		mouse_init_pos = GetScreenToWorld2D(GetMousePosition(), camera);
 	}
 	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-		if (GetMouseX() - mouse_init_pos.x < 0 && GetMouseY() - mouse_init_pos.y > 0) {
+		if (mouse_pos.x - mouse_init_pos.x < 0 && mouse_pos.y - mouse_init_pos.y > 0) {
+		// if (GetMouseX() - mouse_init_pos.x < 0 && GetMouseY() - mouse_init_pos.y > 0) {
 			new = (Rectangle) {
-				GetMouseX(), 
+				mouse_pos.x, 
 				mouse_init_pos.y, 
-				mouse_init_pos.x - GetMouseX(),
-				GetMouseY() - mouse_init_pos.y
+				mouse_init_pos.x - mouse_pos.x,
+				mouse_pos.y - mouse_init_pos.y
 			};
+			// new = (Rectangle) {
+			// 	GetMouseX(), 
+			// 	mouse_init_pos.y, 
+			// 	mouse_init_pos.x - GetMouseX(),
+			// 	GetMouseY() - mouse_init_pos.y
+			// };
 			DrawRectangleRec(new, (Color){0xaa, 0xcc, 0xee, 0x77});
 		}
-		else if (GetMouseX() - mouse_init_pos.x > 0 && GetMouseY() - mouse_init_pos.y < 0) {
+		else if (mouse_pos.x - mouse_init_pos.x > 0 && mouse_pos.y - mouse_init_pos.y < 0) {
+		// else if (GetMouseX() - mouse_init_pos.x > 0 && GetMouseY() - mouse_init_pos.y < 0) {
 
 			new = (Rectangle) {
 				mouse_init_pos.x,
-				GetMouseY(), 
-				GetMouseX() - mouse_init_pos.x,
-				mouse_init_pos.y - GetMouseY()
+				mouse_pos.y, 
+				mouse_pos.x - mouse_init_pos.x,
+				mouse_init_pos.y - mouse_pos.y
 			};
+			// new = (Rectangle) {
+			// 	mouse_init_pos.x,
+			// 	GetMouseY(), 
+			// 	GetMouseX() - mouse_init_pos.x,
+			// 	mouse_init_pos.y - GetMouseY()
+			// };
 			DrawRectangleRec(new, (Color){0xaa, 0x00, 0x00, 0x77});
 		}
-		else if (GetMouseX() - mouse_init_pos.x < 0 && GetMouseY() - mouse_init_pos.y < 0) {
+		else if (mouse_pos.x - mouse_init_pos.x < 0 && mouse_pos.y - mouse_init_pos.y < 0) {
+		// else if (GetMouseX() - mouse_init_pos.x < 0 && GetMouseY() - mouse_init_pos.y < 0) {
 			new = (Rectangle) { 
-				GetMouseX(),
-				GetMouseY(),
-				mouse_init_pos.x - GetMouseX(), 
-				mouse_init_pos.y - GetMouseY() 
+				mouse_pos.x,
+				mouse_pos.y,
+				mouse_init_pos.x - mouse_pos.x, 
+				mouse_init_pos.y - mouse_pos.y 
 			};
+			// new = (Rectangle) { 
+			// 	GetMouseX(),
+			// 	GetMouseY(),
+			// 	mouse_init_pos.x - GetMouseX(), 
+			// 	mouse_init_pos.y - GetMouseY() 
+			// };
 			DrawRectangleRec(new, (Color){0xaa, 0x00, 0x00, 0x77});
 		}
 		else {
 			new = (Rectangle) { 
 				mouse_init_pos.x, 
 				mouse_init_pos.y, 
-				GetMouseX() - mouse_init_pos.x,
-				GetMouseY() - mouse_init_pos.y
+				mouse_pos.x - mouse_init_pos.x,
+				mouse_pos.y - mouse_init_pos.y
 			};
+			// new = (Rectangle) { 
+			// 	mouse_init_pos.x, 
+			// 	mouse_init_pos.y, 
+			// 	GetMouseX() - mouse_init_pos.x,
+			// 	GetMouseY() - mouse_init_pos.y
+			// };
 			DrawRectangleRec(new, (Color){0xaa, 0x00, 0x00, 0x77});
 		}
 	}
@@ -166,10 +199,9 @@ int main (void)
 	// Texture2D background = LoadTexture("./resources/sprites/morgen1.png");
 	Texture2D background = LoadTexture("./resources/sprites/hoshi.png");
 
-	Camera2D camera = {0};
 
-	camera.target = (Vector2) {0, 0};
-	camera.target = (Vector2) {GetRenderWidth(), GetRenderHeight()};
+	// camera.target = (Vector2) {0, 0};
+	camera.target = (Vector2) {GetRenderWidth() / 3, GetRenderHeight() / 3};
 	camera.offset = (Vector2) {GetRenderWidth()/2.0f, GetRenderHeight()/2.0f};
 	camera.rotation = 0.0f;
 	camera.zoom = 1.0f;
@@ -177,17 +209,16 @@ int main (void)
 	// Vector2 mouse_init_pos;
 
 	Rectangle rec_to_add = {0};
+	int mode = 0;
 
 	while (!WindowShouldClose()) {
 		if (IsKeyDown(KEY_ESCAPE)) CloseWindow();
 		BeginDrawing();
-		DrawTextEx(mona, TextFormat("rectangle number: %d\n", all_recs.size), (Vector2){ 1.0f, 11.0f }, (float)mona.baseSize, 2, GREEN); 
-		DrawTextEx(mona, "r to reset selection", (Vector2){ 1.0f, 31.0f }, (float)mona.baseSize, 2, GREEN); 
-		DrawTextEx(mona, "rmb to add new rectangle in selected area", (Vector2){ 1.0f, 51.0f }, (float)mona.baseSize, 2, GREEN); 
-		DrawTextEx(mona, "q to quit", (Vector2){ 1.0f, 71.0f }, (float)mona.baseSize, 2, GREEN); 
-		DrawTextEx(mona, TextFormat("sizeof item: %ld\n", malloc_usable_size(all_recs.item)), (Vector2){ 1.0f, 91.0f }, (float)mona.baseSize, 2, GREEN); 
-		DrawTextEx(mona, TextFormat("size %d capacity %d\n", all_recs.size, all_recs.capacity), (Vector2){ 1.0f, 111.0f }, (float)mona.baseSize, 2, GREEN); 
-		DrawTextEx(mona, TextFormat("selected rec %d\n", selected_rec), (Vector2){ 1.0f, 131.0f }, (float)mona.baseSize, 2, GREEN); 
+		// DrawTextEx(mona, "r to reset selection", (Vector2){ 1.0f, 31.0f }, (float)mona.baseSize, 2, GREEN); 
+		// DrawTextEx(mona, "rmb to add new rectangle in selected area", (Vector2){ 1.0f, 51.0f }, (float)mona.baseSize, 2, GREEN); 
+		// DrawTextEx(mona, "q to quit", (Vector2){ 1.0f, 71.0f }, (float)mona.baseSize, 2, GREEN); 
+		// DrawTextEx(mona, TextFormat("sizeof item: %ld\n", malloc_usable_size(all_recs.item)), (Vector2){ 1.0f, 91.0f }, (float)mona.baseSize, 2, GREEN); 
+		// DrawTextEx(mona, TextFormat("size %d capacity %d\n", all_recs.size, all_recs.capacity), (Vector2){ 1.0f, 111.0f }, (float)mona.baseSize, 2, GREEN); 
 
 		// ClearBackground( (Color){0x11, 0x11, 0x11, 0xff} );
 		// ClearBackground( (Color){0x4d, 0x25, 0x4a, 0xff} );
@@ -195,13 +226,15 @@ int main (void)
 		// DrawTexturePro(background, (Rectangle) {0,0,1589,1049}, (Rectangle) {0,0,(float)GetRenderWidth(),(float)GetScreenHeight()}, (Vector2) {0,0}, 0.0f, (Color) {255,255,255,50});
 		// DrawTexturePro(background, (Rectangle) {0,0,1448,741}, (Rectangle) {0,0,(float)GetRenderWidth(),(float)GetScreenHeight()}, (Vector2) {0,0}, 0.0f, (Color) {255,255,255,150});
 
-		// DrawTexturePro(background, (Rectangle) {0,0,(float)GetRenderWidth(),(float)GetScreenHeight()}, (Rectangle) {0,0,(float)GetRenderWidth(),(float)GetScreenHeight()}, (Vector2) {0,0}, 0.0f, (Color) {255,255,255,50});
+		// DrawTexturePro(background, (Rectangle) {0,0,(float)GetRenderWidth()/1.2,(float)GetScreenHeight()/1.2}, (Rectangle) {0,0,(float)GetRenderWidth(),(float)GetScreenHeight()}, (Vector2) {0,0}, 0.0f, (Color) {255,255,255,50});
 		DrawTexturePro(background, (Rectangle) {0,0,(float)GetRenderWidth()*2,(float)GetScreenHeight()*2}, (Rectangle) {0,0,(float)GetRenderWidth(),(float)GetScreenHeight()}, (Vector2) {0,0}, 0.0f, (Color) {255,255,255,20});
 
 		if (GetMouseWheelMove() > 0) camera.zoom += 0.05;
 		if (GetMouseWheelMove() < 0) camera.zoom -= 0.05;
+		if (camera.zoom < 0.1f) camera.zoom = 0.1f;
+		if (camera.zoom > 8.0f) camera.zoom = 8.0f;
 
-		DrawRectangle(0, 0, 10, 10, WHITE); // test
+		// DrawRectangle(0, 0, 10, 10, WHITE); // test
 
 		if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
 			Vector2 delta = GetMouseDelta();
@@ -209,32 +242,61 @@ int main (void)
 			camera.target = Vector2Add(camera.target, delta);
 		}
 
-		DrawRectangleRec(rec_to_add, (Color){0x22, 0x77, 0x22, 0xcc});
+		// DrawRectangleRec(rec_to_add, (Color){0x22, 0x77, 0x22, 0xcc});
 		if (IsKeyPressed(KEY_DELETE) && selected_rec != -1) {
 			rectangle_remove(selected_rec);
 			selected_rec = -1;
 		}
 
-		draw_new_rectangle(&rec_to_add);
-		for (int i = 0; i < all_recs.size; i++) {
-			if (CheckCollisionPointRec(GetMousePosition(), all_recs.item[i]) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))  selected_rec = i; 
-			if (i == selected_rec) DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xcc, 0xff});
-			else if (CheckCollisionPointRec(GetMousePosition(), all_recs.item[i])) DrawRectangleRec(all_recs.item[i], (Color){0xcc, 0xff, 0xcc, 0xff});
-			else DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xff, 0xff});
-			printf("%d: x %f y %f w %f h %f\n", i, all_recs.item[i].x, all_recs.item[i].y, all_recs.item[i].width, all_recs.item[i].height);
-		}
+		// draw_new_rectangle(&rec_to_add);
+		// for (int i = 0; i < all_recs.size; i++) {
+		// 	if (CheckCollisionPointRec(GetMousePosition(), all_recs.item[i]) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))  selected_rec = i; 
+		// 	if (i == selected_rec) DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xcc, 0xff});
+		// 	else if (CheckCollisionPointRec(GetMousePosition(), all_recs.item[i])) DrawRectangleRec(all_recs.item[i], (Color){0xcc, 0xff, 0xcc, 0xff});
+		// 	else DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xff, 0xff});
+		// 	// printf("%d: x %f y %f w %f h %f\n", i, all_recs.item[i].x, all_recs.item[i].y, all_recs.item[i].width, all_recs.item[i].height);
+		// }
 		printf("\n");
 
-		DrawGrid(100, 100);
+		if (IsKeyPressed(KEY_ONE)) mode = 0;
+		if (IsKeyPressed(KEY_TWO)) mode = 1;
+		if (IsKeyPressed(KEY_T)) camera.target = (Vector2) {0};
+
 
 		BeginMode2D(camera);
 		{
+			// draw a fucking grid
+			for (int i = -100; i < 100; i++) {
+				DrawLine(-10000, i * 100, 10000, i * 100, (Color){0x00,0x00,0x00,0xff});
+			}
+			for (int i = -100; i < 100; i++) {
+				DrawLine(i * 100, -10000, i * 100, 10000, (Color){0x00,0x00,0x00,0xff});
+			}
+
+			for (int i = 0; i < all_recs.size; i++) {
+				if (mode == 1 && CheckCollisionPointRec(GetScreenToWorld2D(GetMousePosition(), camera), all_recs.item[i]) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))  selected_rec = i; 
+				if (mode == 1 && i == selected_rec) DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xcc, 0xff});
+				else if (mode == 1 && CheckCollisionPointRec(GetScreenToWorld2D(GetMousePosition(), camera), all_recs.item[i])) DrawRectangleRec(all_recs.item[i], (Color){0xcc, 0xff, 0xcc, 0xff});
+				else DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xff, 0xff});
+				// printf("%d: x %f y %f w %f h %f\n", i, all_recs.item[i].x, all_recs.item[i].y, all_recs.item[i].width, all_recs.item[i].height);
+			}
+			if (mode == 0) draw_new_rectangle(&rec_to_add);
 			// SetMouseOffset(camera.target.x, camera.target.y);
 			// draw_new_rectangle(&rec_to_add);
 			// GuiWindowBox((Rectangle){100, 100, 100, 20}, "GIRLS KISSING");
 			// DrawRectangle(0, 0, 30, 30, WHITE); // test
+			// DrawTextEx(mona, TextFormat("\n", ), (Vector2){ 1.0f, 91.0f }, (float)mona.baseSize, 2, GREEN); 
+			DrawTextEx(mona, "(0, 0)!", (Vector2){ 0.0f, 0.0f }, (float)mona.baseSize, 2, RED); 
+               // DrawGrid(100, 50);
 		}
 		EndMode2D();
+
+		DrawTextEx(mona, TextFormat("rectangle number: %d\n", all_recs.size), (Vector2){ 1.0f, 1.0f }, (float)mona.baseSize, 2, GREEN); 
+		DrawTextEx(mona, TextFormat("selected rec %d\n", selected_rec), (Vector2){ 1.0f, 21.0f }, (float)mona.baseSize, 2, GREEN); 
+
+		if (mode == 0) DrawTextEx(mona, "current mode: drawing", (Vector2){ 1.0f, 41.0f }, (float)mona.baseSize, 2, BLUE); 
+		if (mode == 1) DrawTextEx(mona, "current mode: editing", (Vector2){ 1.0f, 41.0f }, (float)mona.baseSize, 2, YELLOW); 
+		DrawFPS(GetRenderWidth() - 100, GetScreenHeight() - 20);
 
 		EndDrawing();
 
