@@ -43,10 +43,15 @@ public:
 	Texture2D texture;
 	Color color = WHITE;
 
-	void move_in_cycles (float move_x, float move_y, float speed, int wait)
+	void update_platform_pos ()
 	{
-		puts("wip");
+		hitbox.x += vel.x * GetFrameTime();
+		hitbox.y += vel.y * GetFrameTime();
 	};
+	// void move_in_cycles (float move_x, float move_y, float speed, int wait)
+	// {
+	// 	puts("wip");
+	// };
 };
 
 void read_level_file (char *file_path, std::vector<Platform> *platforms)
@@ -105,7 +110,9 @@ public:
 	// bool odd_frame = false;
 	bool in_air = false;
 	bool is_grounded = false;
-	bool is_grounded2 = false;
+	bool is_truly_grounded = false;
+	int truly_grounded_counter = 0;
+	int index_of_platform_that_set_true_grounded_state = 0; // lol
 	// bool is_jump = true;
 	bool can_jump = true;
 	char facing = 'l';
@@ -247,7 +254,13 @@ public:
 	// 	return false;
 	// };
 
-	bool collision_resolution_v2 (Platform *platform) {
+	void standing_on_moving_platform_update (Platform *platform) 
+	{
+			// if (platform->vel.x != 0 && within_x) { pos.x += platform->vel.x * GetFrameTime(); /* prev_pos.x = pos.x; */ } // moving platforms update
+			if (platform->vel.x != 0 && is_truly_grounded) { pos.x += platform->vel.x * GetFrameTime(); /* prev_pos.x = pos.x; */ } // moving platforms update
+	};
+
+	bool collision_resolution_v2 (Platform *platform, int index) {
 		if (CheckCollisionRecs(hitbox, platform->hitbox)) {
 
 			// a1 > b1
@@ -274,23 +287,43 @@ public:
 				platform->hitbox.x  + platform->hitbox.width < prev_pos.x + hitbox.width
 			) within_x = false; else within_x = true;
 
+
 			if (prev_pos.y != pos.y && within_x) {
 				pos.y = prev_pos.y;
 				y_vel = 0;
 				// is_grounded = true;
-				if (prev_pos.y == pos.y) is_grounded = true;
+				// if (prev_pos.y == pos.y) {
+				if (prev_pos.y <= pos.y) {
+					index_of_platform_that_set_true_grounded_state = index;
+					is_grounded = true;
+				}
 			}
 
-			if (prev_pos.x != pos.x && !within_x) { 
+			// if (platform->vel.x < 0 && platform->hitbox.x > hitbox.x + hitbox.width) { pos.x = platform->hitbox.x - hitbox.width - 1; return true; }
+			// else if (platform->vel.x > 0 && platform->hitbox.x < hitbox.x) { pos.x = platform->hitbox.x + platform->hitbox.width + 1; return true; }
+
+			// if (platform->vel.x < 0 && x_vel >= 0) { pos.x = platform->hitbox.x - hitbox.width - 1; /*return true;*/ }
+			// else if (platform->vel.x < 0 && x_vel >= 0) { pos.x = platform->hitbox.x - hitbox.width - 1; /*return true;*/ }
+
+			if (platform->vel.x < 0 && x_vel >= 0 && !within_x) { pos.x = platform->hitbox.x - hitbox.width - 1; /*return true;*/ } // moving platforms update
+			else if (platform->vel.x > 0 && x_vel <= 0 && !within_x) { pos.x = platform->hitbox.x + platform->hitbox.width + 1; /* return true; */ } // moving platforms update
+			// else if (platform->vel.x != 0 && within_x) { pos.x += platform->vel.x * GetFrameTime(); /* prev_pos.x = pos.x; */ } // moving platforms update
+			else if (prev_pos.x != pos.x && !within_x) { 
 				pos.x = prev_pos.x;
 				x_vel = 0;
-			}
+			} 
 
 			hitbox.y = pos.y;
 			hitbox.x = pos.x;
 
+			if (within_x && CheckCollisionRecs(hitbox, platform->hitbox)) { // holy shit does it actually WORK????!! nvm whatever
+				// force player out of collision
+				if (pos.x + hitbox.width / 2 <= platform->hitbox.x + platform->hitbox.width / 2){ pos.x = platform->hitbox.x - hitbox.width - 1; /*return true;*/ } // if in left half of rec
+				else if (pos.x + hitbox.width / 2 > platform->hitbox.x + platform->hitbox.width / 2){ pos.x = platform->hitbox.x + platform->hitbox.width + 1; /* return true; */ } // if in right half of rec
+			}
+
 			// if (CheckCollisionRecs(hitbox, platform->hitbox)) goto repeat; // i dont fucking know anymore dont judge this solution please leave me alone ok?
-			if (CheckCollisionRecs(hitbox, platform->hitbox)) collision_resolution_v2(platform); // idk i think this is better
+			// if (CheckCollisionRecs(hitbox, platform->hitbox)) collision_resolution_v2(platform); // idk i think this is better
 
 			return true;
 		}
@@ -328,10 +361,13 @@ public:
 				{ return a.second < b.second; }
 		);
 		bool collision_frame = false;
+
+		// int index;
 		for (auto i : possible_collisions_list) {
 			// cool_collision_detection(&platforms[i.first]);
 			// if (cool_collision_detection(&platforms[i.first])) collision_frame = true;
-			if (collision_resolution_v2(&platforms[i.first])) collision_frame = true;
+			if (collision_resolution_v2(&platforms[i.first], i.first)) collision_frame = true;
+			// index++;
 		}
 		// if (collision_frame) puts("collision frame");
 		// else puts(".");
@@ -388,30 +424,31 @@ int main ()
 
 	std::vector<Platform> platforms;
 
-	read_level_file("./level-0", &platforms);
+	// read_level_file("./level-1", &platforms);
 
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){800, 300, 300, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){300, 450, 300, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 600, 300, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 250, 30, 300}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 700, 300, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 600, 30, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 610, 30, 30}, nijika});
-	// // platforms.push_back({(Vector2) {0, 0}, (Platform)(Rectangle){80, 601, 30, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 500, 30, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 550, 30, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 300, 30, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){320, 200, 30, 300}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 730, 9900, 10}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1200, 600, 200, 10}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1400, 600, 200, 10}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1620, 600, 200, 10}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){4000, 200, 5, 1000}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2000, 600, 300, 20}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2100, 600, 300, 20}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2200, 600, 300, 20}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2500, 600, 300, 20}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){240, 600, 30, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){800, 300, 300, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){300, 450, 300, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 600, 300, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 250, 30, 300}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 700, 300, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 600, 30, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 610, 30, 30}, nijika});
+	// platforms.push_back({(Vector2) {0, 0}, (Platform)(Rectangle){80, 601, 30, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 500, 30, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 550, 30, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 300, 30, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){320, 200, 30, 300}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 730, 9900, 10}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1200, 600, 200, 10}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1400, 600, 200, 10}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1620, 600, 200, 10}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){4000, 200, 5, 1000}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2000, 600, 300, 20}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2100, 600, 300, 20}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2200, 600, 300, 20}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2500, 600, 300, 20}, nijika});
+
+	platforms.push_back((Platform){(Vector2) {-10, 0}, (Rectangle){240, 600, 30, 30}, nijika});
 
 	float camera_x_follow = player.pos.x + player.hitbox.width / 2;
 	float camera_y_follow = player.pos.y + player.hitbox.height / 2;
@@ -446,6 +483,17 @@ int main ()
 		player.is_grounded = false;
 
 		player.collision_detection(platforms);
+
+		player.standing_on_moving_platform_update(&platforms[player.index_of_platform_that_set_true_grounded_state]);
+
+		if (player.is_grounded) { player.is_truly_grounded = true; player.truly_grounded_counter = 1; }
+		else if (!player.is_grounded && player.truly_grounded_counter) { player.truly_grounded_counter--; }
+		else { player.is_truly_grounded = false; }
+		printf("player TRULY grounded %d\n", player.is_truly_grounded);
+		printf("platform that set..... %d\n", player.index_of_platform_that_set_true_grounded_state);
+	
+		// player.truly_grounded_counter = 1;
+		// player.update_pos();
 
 		// {  // COLLISIONS
 		// 	// std::vector<Platform> possible_collisions_list;
@@ -501,8 +549,6 @@ int main ()
 		player.move_left_right(dir);
 
 		player.update_pos();
-
-		// player.update_pos();
 
 		// if (camera_x_follow < player.pos.x + player.hitbox.width / 2 - 60) camera_x_follow = player.pos.x + player.hitbox.width / 2 - 60;
 		// if (camera_x_follow > player.pos.x + player.hitbox.width / 2 + 60) camera_x_follow = player.pos.x + player.hitbox.width / 2 + 60;
@@ -560,11 +606,13 @@ int main ()
 		int asdlkf = 0;
 		for (auto i : platforms) {
 			// DrawRectangleRec(i.hitbox, i.color);
+			platforms[asdlkf].update_platform_pos();
 			DrawRectangleRec(i.hitbox, Color{0x87, 0x67, 0x60, 0xff});
 			// DrawRectangleRec(i.hitbox, Color{0xaa, 0x67, 0xc2, 0xff});
 			// DrawTexturePro(i.texture, (Rectangle) {0, 0, i.hitbox.width, i.hitbox.height}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
 			// DrawTexturePro(grass, (Rectangle) {0, 0, i.hitbox.width * 10, i.hitbox.height * 10}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
-			// DrawTextEx(mona, TextFormat("%d %.1f %.1f\n", asdlkf, i.hitbox.x, i.hitbox.y), (Vector2){ i.hitbox.x, i.hitbox.y }, (float)mona.baseSize, 1, BLUE);
+			DrawTextEx(mona, TextFormat("%d %.1f %.1f\n", asdlkf, i.hitbox.x, i.hitbox.y), (Vector2){ i.hitbox.x, i.hitbox.y }, (float)mona.baseSize, 1, BLUE);
+			DrawTextEx(mona, TextFormat("%.1f %.1f\n", i.vel.x, i.vel.y), (Vector2){ i.hitbox.x, i.hitbox.y + 20 }, (float)mona.baseSize, 1, BLUE);
 			asdlkf++;
 		}
 
@@ -586,6 +634,7 @@ int main ()
 		DrawTextEx(mona, "91rl5 ki55in9.", (Vector2){ 1.0f, 40.0f }, (float)mona.baseSize, 2, RED);
 		DrawTextEx(mona, "girls kissing - girls kissing - girls kissing - girls kissing", (Vector2){ 1.0f, 60.0f }, (float)mona.baseSize, 2, ORANGE);
 		DrawTextEx(mona, TextFormat("x_vel %f\ny_vel %f\n", player.x_vel, player.y_vel), (Vector2){ 1.0f, 80.0f }, (float)mona.baseSize, 2, YELLOW);
+		DrawTextEx(mona, TextFormat("pos x %f pos y %f\n", player.pos.x, player.pos.y), (Vector2){ 1.0f, 180.0f }, (float)mona.baseSize, 2, RED);
 		DrawTextEx(mona, TextFormat("frame no. %d\n", frame), (Vector2){ 1.0f, 120.0f }, (float)mona.baseSize, 2, GREEN);
 		DrawTextEx(mona, TextFormat("frame time: %f\n", GetFrameTime()), (Vector2){ 1.0f, 140.0f }, (float)mona.baseSize, 2, BLUE);
 		DrawTextEx(mona, TextFormat("coyote: %d\n", player.coyote), (Vector2){ 1.0f, 160.0f }, (float)mona.baseSize, 2, PURPLE);

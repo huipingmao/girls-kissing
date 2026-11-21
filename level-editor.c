@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
+// #define RAYGUI_IMPLEMENTATION
+// #include "raygui.h"
 
 struct all_recs {
 	Rectangle *item;
@@ -81,7 +81,7 @@ Rectangle new = {0};
 void draw_new_rectangle (Rectangle *rec_to_add)
 {
 	Vector2 mouse_pos = GetScreenToWorld2D(GetMousePosition(), camera);
-	printf("x mp %f y mp %f\n", mouse_pos.x, mouse_pos.y);
+	// printf("x mp %f y mp %f\n", mouse_pos.x, mouse_pos.y);
 
 	DrawRectangleRec(*rec_to_add, (Color){0x22, 0x77, 0x22, 0xcc});
 	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -103,7 +103,7 @@ void draw_new_rectangle (Rectangle *rec_to_add)
 			// 	mouse_init_pos.x - GetMouseX(),
 			// 	GetMouseY() - mouse_init_pos.y
 			// };
-			DrawRectangleRec(new, (Color){0xaa, 0xcc, 0xee, 0x77});
+			DrawRectangleRec(new, (Color){0xaa, 0x00, 0xee, 0x77});
 		}
 		else if (mouse_pos.x - mouse_init_pos.x > 0 && mouse_pos.y - mouse_init_pos.y < 0) {
 		// else if (GetMouseX() - mouse_init_pos.x > 0 && GetMouseY() - mouse_init_pos.y < 0) {
@@ -179,9 +179,9 @@ void draw_new_rectangle (Rectangle *rec_to_add)
 		}
 	}
 
-	if (IsKeyPressed(KEY_R)) {
-		*rec_to_add = (Rectangle){0};
-	}
+	// if (IsKeyPressed(KEY_R)) {
+	// 	*rec_to_add = (Rectangle){0};
+	// }
 	// printf("x %f y %f w %f h %f\n\n", new.x, new.y, new.width, new.height);
 }
 
@@ -248,6 +248,35 @@ int main (void)
 			selected_rec = -1;
 		}
 
+		if (mode == 1 && selected_rec != -1) {
+			if (IsKeyDown(KEY_LEFT_CONTROL)) {
+				// increase rectangle size
+				if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].height += 1; all_recs.item[selected_rec].y -= 1; }
+				if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].height += 1; }
+				if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].width += 1; all_recs.item[selected_rec].x -= 1; }
+				if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].width += 1; }
+			} else if (IsKeyDown(KEY_LEFT_ALT)) {
+				// decrease rectangle size
+				if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].height -= 1; }
+				if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].height -= 1; all_recs.item[selected_rec].y += 1; }
+				if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].width -= 1;  }
+				if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].width -= 1; all_recs.item[selected_rec].x += 1; }
+			} else {
+				// move rectangle
+				if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].y -= 1; }
+				if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].y += 1; }
+				if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].x -= 1; }
+				if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].x += 1; }
+			}
+		}
+
+		if (mode == 0 && IsKeyPressed(KEY_R)) {
+			rec_to_add = (Rectangle){0};
+		}
+		if (mode == 1 && IsKeyPressed(KEY_R)) {
+			selected_rec = -1;
+		}
+
 		// draw_new_rectangle(&rec_to_add);
 		// for (int i = 0; i < all_recs.size; i++) {
 		// 	if (CheckCollisionPointRec(GetMousePosition(), all_recs.item[i]) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))  selected_rec = i; 
@@ -256,10 +285,11 @@ int main (void)
 		// 	else DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xff, 0xff});
 		// 	// printf("%d: x %f y %f w %f h %f\n", i, all_recs.item[i].x, all_recs.item[i].y, all_recs.item[i].width, all_recs.item[i].height);
 		// }
-		printf("\n");
+		// printf("\n");
 
 		if (IsKeyPressed(KEY_ONE)) mode = 0;
 		if (IsKeyPressed(KEY_TWO)) mode = 1;
+		if (IsKeyPressed(KEY_THREE)) mode = 2;
 		if (IsKeyPressed(KEY_T)) camera.target = (Vector2) {0};
 
 
@@ -267,19 +297,23 @@ int main (void)
 		{
 			// draw a fucking grid
 			for (int i = -100; i < 100; i++) {
-				DrawLine(-10000, i * 100, 10000, i * 100, (Color){0x00,0x00,0x00,0xff});
+				DrawLine(-2000, i * 20, 2000, i * 20, (Color){0x00,0x00,0x00,0xff});
 			}
 			for (int i = -100; i < 100; i++) {
-				DrawLine(i * 100, -10000, i * 100, 10000, (Color){0x00,0x00,0x00,0xff});
+				DrawLine(i * 20, -2000, i * 20, 2000, (Color){0x00,0x00,0x00,0xff});
 			}
 
 			for (int i = 0; i < all_recs.size; i++) {
-				if (mode == 1 && CheckCollisionPointRec(GetScreenToWorld2D(GetMousePosition(), camera), all_recs.item[i]) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))  selected_rec = i; 
-				if (mode == 1 && i == selected_rec) DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xcc, 0xff});
-				else if (mode == 1 && CheckCollisionPointRec(GetScreenToWorld2D(GetMousePosition(), camera), all_recs.item[i])) DrawRectangleRec(all_recs.item[i], (Color){0xcc, 0xff, 0xcc, 0xff});
+				if (mode == 1 && CheckCollisionPointRec(GetScreenToWorld2D(GetMousePosition(), camera), all_recs.item[i]) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))  selected_rec = i; // select rect on mouse press 
+				// if (mode == 1 && i == selected_rec) DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xcc, 0xff}); // color selected rec
+				if (i == selected_rec) DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xcc, 0xff}); // color selected rec
+				else if (mode == 1 && CheckCollisionPointRec(GetScreenToWorld2D(GetMousePosition(), camera), all_recs.item[i])) DrawRectangleRec(all_recs.item[i], (Color){0xcc, 0xff, 0xcc, 0xff}); // color rec colliding with mouse
 				else DrawRectangleRec(all_recs.item[i], (Color){0xff, 0xcc, 0xff, 0xff});
 				// printf("%d: x %f y %f w %f h %f\n", i, all_recs.item[i].x, all_recs.item[i].y, all_recs.item[i].width, all_recs.item[i].height);
+				if (mode == 2) { printf("{%f, %f, %f, %f}\n", all_recs.item[i].x, all_recs.item[i].y, all_recs.item[i].width, all_recs.item[i].height);};
 			}
+			if (mode == 2) { mode = 1; printf("\n"); }
+			// printf("\n");
 			if (mode == 0) draw_new_rectangle(&rec_to_add);
 			// SetMouseOffset(camera.target.x, camera.target.y);
 			// draw_new_rectangle(&rec_to_add);
@@ -294,8 +328,15 @@ int main (void)
 		DrawTextEx(mona, TextFormat("rectangle number: %d\n", all_recs.size), (Vector2){ 1.0f, 1.0f }, (float)mona.baseSize, 2, GREEN); 
 		DrawTextEx(mona, TextFormat("selected rec %d\n", selected_rec), (Vector2){ 1.0f, 21.0f }, (float)mona.baseSize, 2, GREEN); 
 
+		DrawTextEx(mona, TextFormat("(%d %d)", GetMouseX(), GetMouseY()), (Vector2){ GetMouseX(), GetMouseY() - 25}, (float)mona.baseSize, 2, WHITE); 
+		// DrawTextEx(mona, TextFormat("(x %.0f y %.0f w %.0f h %.0f)", rec_to_add.x, rec_to_add.y, rec_to_add.width, rec_to_add.height), (Vector2){ GetMouseX(), GetMouseY() - 45}, (float)mona.baseSize, 1, GRAY);
+		// 
+		DrawTextEx(mona, TextFormat("(w %.0f h %.0f", rec_to_add.width, rec_to_add.height), (Vector2){ GetMouseX(), GetMouseY() - 45}, (float)mona.baseSize, 1, GRAY); 
+		DrawTextEx(mona, TextFormat(" x %.0f y %.0f)", rec_to_add.x, rec_to_add.y), (Vector2){ GetMouseX(), GetMouseY() - 65}, (float)mona.baseSize, 1, GRAY); 
+
 		if (mode == 0) DrawTextEx(mona, "current mode: drawing", (Vector2){ 1.0f, 41.0f }, (float)mona.baseSize, 2, BLUE); 
 		if (mode == 1) DrawTextEx(mona, "current mode: editing", (Vector2){ 1.0f, 41.0f }, (float)mona.baseSize, 2, YELLOW); 
+		DrawTextEx(mona, "press \"3\" to dump all rectangle data to output", (Vector2){ 1.0f, 61.0f }, (float)mona.baseSize, 2, GREEN); 
 		DrawFPS(GetRenderWidth() - 100, GetScreenHeight() - 20);
 
 		EndDrawing();
