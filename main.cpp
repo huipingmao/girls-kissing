@@ -360,6 +360,7 @@ int main ()
 	InitWindow(1000, 800, "girls kissing gaem");
 	InitAudioDevice();
 	SetTargetFPS(240);
+	SetExitKey(KEY_ESCAPE);
 
 
 	Font mona = LoadFontEx("resources/MonaspaceRadonFrozen-Regular.ttf", 20, 0, 250);
@@ -420,10 +421,10 @@ int main ()
 
 		frame++;
 
-		if (IsKeyPressed(KEY_Q)) { 
-			CloseWindow();
-			CloseAudioDevice();
-		}
+		// if (IsKeyPressed(KEY_Q)) { 
+		// 	CloseWindow();
+		// 	CloseAudioDevice();
+		// }
 		if (IsKeyPressed(KEY_R)) { player.pos.x = 700; player.pos.y = 100;
 							 player.prev_pos.x = 700; player.prev_pos.y = 100; }
 
@@ -607,4 +608,6 @@ int main ()
 		// 		player.prev_pos.x + player.hitbox.width
 		// 	));
 	}
+	CloseWindow();
+	CloseAudioDevice();
 }
