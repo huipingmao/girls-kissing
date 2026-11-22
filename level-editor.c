@@ -336,7 +336,9 @@ int main (void)
 
 		if (mode == 0) DrawTextEx(mona, "current mode: drawing", (Vector2){ 1.0f, 41.0f }, (float)mona.baseSize, 2, BLUE); 
 		if (mode == 1) DrawTextEx(mona, "current mode: editing", (Vector2){ 1.0f, 41.0f }, (float)mona.baseSize, 2, YELLOW); 
-		DrawTextEx(mona, "press \"3\" to dump all rectangle data to output", (Vector2){ 1.0f, 61.0f }, (float)mona.baseSize, 2, GREEN); 
+		DrawTextEx(mona, "press \"1\" to enter drawing mode", (Vector2){ 1.0f, 61.0f }, (float)mona.baseSize, 2, GREEN); 
+		DrawTextEx(mona, "press \"2\" to enter edit mode", (Vector2){ 1.0f, 81.0f }, (float)mona.baseSize, 2, GREEN); 
+		DrawTextEx(mona, "press \"3\" to dump all rectangle data to output", (Vector2){ 1.0f, 101.0f }, (float)mona.baseSize, 2, GREEN); 
 		DrawFPS(GetRenderWidth() - 100, GetScreenHeight() - 20);
 
 		EndDrawing();

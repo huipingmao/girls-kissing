@@ -288,7 +288,23 @@ public:
 			) within_x = false; else within_x = true;
 
 
-			if (prev_pos.y != pos.y && within_x) {
+			if (
+				platform->vel.y < 0 // platform is rising
+				&& 
+				pos.y + hitbox.height / 2 <= platform->hitbox.y + platform->hitbox.height / 2 // player is in upper half of rec
+				&& within_x)
+				{ 
+					y_vel = 0; pos.y = platform->hitbox.y - hitbox.height + platform->vel.y * GetFrameTime(); is_grounded = true; index_of_platform_that_set_true_grounded_state = index; 
+			} // moving platforms update
+			else if (
+				platform->vel.y > 0 // platform is falling
+				&& 
+				pos.y + hitbox.height / 2 > platform->hitbox.y + platform->hitbox.height / 2 // player is in lower half of rec
+				&& within_x)
+				{ 
+					y_vel = 0; pos.y = platform->hitbox.y + platform->hitbox.height + platform->vel.y * GetFrameTime(); index_of_platform_that_set_true_grounded_state = index; 
+			} // moving platforms update
+			else if (prev_pos.y != pos.y && within_x) {
 				pos.y = prev_pos.y;
 				y_vel = 0;
 				// is_grounded = true;
@@ -307,6 +323,8 @@ public:
 
 			if (platform->vel.x < 0 && x_vel >= 0 && !within_x) { pos.x = platform->hitbox.x - hitbox.width - 1; /*return true;*/ } // moving platforms update
 			else if (platform->vel.x > 0 && x_vel <= 0 && !within_x) { pos.x = platform->hitbox.x + platform->hitbox.width + 1; /* return true; */ } // moving platforms update
+			// if (platform->vel.x < 0 && x_vel >= 0 && !within_x) { pos.x = platform->hitbox.x - hitbox.width - platform->vel.x * GetFrameTime(); } // moving platforms update
+			// else if (platform->vel.x > 0 && x_vel <= 0 && !within_x) { pos.x = platform->hitbox.x + platform->hitbox.width + platform->vel.x * GetFrameTime(); } // moving platforms update
 			// else if (platform->vel.x != 0 && within_x) { pos.x += platform->vel.x * GetFrameTime(); /* prev_pos.x = pos.x; */ } // moving platforms update
 			else if (prev_pos.x != pos.x && !within_x) { 
 				pos.x = prev_pos.x;
@@ -431,11 +449,12 @@ int main ()
 	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 600, 300, 30}, nijika});
 	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 250, 30, 300}, nijika});
 	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 700, 300, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 600, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 610, 30, 30}, nijika});
+
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 600, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 610, 30, 30}, nijika});
 	// platforms.push_back({(Vector2) {0, 0}, (Platform)(Rectangle){80, 601, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 500, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 550, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 500, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 550, 30, 30}, nijika});
 	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 300, 30, 30}, nijika});
 	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){320, 200, 30, 300}, nijika});
 	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 730, 9900, 10}, nijika});
@@ -448,6 +467,8 @@ int main ()
 	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2200, 600, 300, 20}, nijika});
 	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2500, 600, 300, 20}, nijika});
 
+	platforms.push_back((Platform){(Vector2) {0, -5}, (Rectangle){100, 550, 30, 30}, nijika});
+	platforms.push_back((Platform){(Vector2) {0, 5}, (Rectangle){70, 500, 30, 30}, nijika});
 	platforms.push_back((Platform){(Vector2) {-10, 0}, (Rectangle){240, 600, 30, 30}, nijika});
 
 	float camera_x_follow = player.pos.x + player.hitbox.width / 2;
