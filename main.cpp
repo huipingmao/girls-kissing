@@ -6,36 +6,6 @@
 #include <fstream>
 #include <cstdio>
 
-// typedef struct {
-// 	std::vector<Platform> platforms;
-// } Level;
-
-bool is_in_range (int a1, int a2, int b1, int b2)
-{
-	if (
-		a1 > b1
-		&&
-		a1 > b2 
-	||
-		a2 < b1
-		&&
-		a2 < b2
-	) return false;
-
-	return true;
-
-	// if (
-	// 	platform->hitbox.x > prev_pos.x
-	// 	&&
-	// 	platform->hitbox.x > prev_pos.x + hitbox.width
-	// 	||
-	// 	platform->hitbox.x + platform->hitbox.width < prev_pos.x
-	// 	&&
-	// 	platform->hitbox.x  + platform->hitbox.width < prev_pos.x + hitbox.width
-	// ) // 2 trivial cases where both points of a platform cannot be in x range of rectangle 
-	// 	{ is_in_range_of_x = false; /* puts("isnt in range"); */ };
-}
-
 class Platform {
 public:
 	Vector2 vel;
@@ -48,10 +18,6 @@ public:
 		hitbox.x += vel.x * GetFrameTime();
 		hitbox.y += vel.y * GetFrameTime();
 	};
-	// void move_in_cycles (float move_x, float move_y, float speed, int wait)
-	// {
-	// 	puts("wip");
-	// };
 };
 
 void read_level_file (char *file_path, std::vector<Platform> *platforms)
@@ -71,16 +37,6 @@ void read_level_file (char *file_path, std::vector<Platform> *platforms)
 		// if (sign == '\n') sign = fgetc(f);
 		sign = fgetc(f);
 	}
-	// while (f.get(ch)) {
-	// 	if (ch == '{') {
-	// 		tmp = {0};
-	// 	} else if (ch == '}') {
-	// 		platforms.push_back();
-	// 	} else if (std::isdigit(ch));
-	// 	else if (ch == ',');
-	// 	else;
-	// 	// std::cout << ch;
-	// }
 	fclose(f);
 
 }
@@ -99,8 +55,6 @@ public:
 	float jump_height = 600;
 	float gravity_accel = 20;
 	float gravity_max = 800;
-	// float max_speed = 5;
-	// float acceleration = 0.1;
 	int health = 1;
 	int coyote = 0;
 	int animation_time = 0;
@@ -195,65 +149,6 @@ public:
 		if (x_vel < -max_speed) x_vel = -max_speed;
 	};
 
-	// bool cool_collision_detection (Platform *platform)
-	// {
-	// 	if (CheckCollisionRecs(hitbox, platform->hitbox)) {
-
-	// 		bool is_in_range_of_x = true;
-
-	// 		if (
-	// 			platform->hitbox.x > prev_pos.x
-	// 			&&
-	// 			platform->hitbox.x > prev_pos.x + hitbox.width
-	// 			||
-	// 			platform->hitbox.x + platform->hitbox.width < prev_pos.x
-	// 			&&
-	// 			platform->hitbox.x  + platform->hitbox.width < prev_pos.x + hitbox.width
-	// 		) // 2 trivial cases where both points of a platform cannot be in x range of rectangle 
-	// 			{ is_in_range_of_x = false; /* puts("isnt in range"); */ };
-
-	// 		if (is_in_range_of_x) {
-	// 			if (pos.y > prev_pos.y) { // from the top
-	// 				pos.y = prev_pos.y;
-	// 				// pos.y = platform->hitbox.y - hitbox.height - 0.01;
-	// 				y_vel = 0;
-	// 				// y_vel = -y_vel/1.3;
-	// 				is_grounded = true;
-	// 			}
-
-	// 			if (pos.y < prev_pos.y) { // from below
-	// 				pos.y = prev_pos.y;
-	// 				// pos.y = platform->hitbox.y + platform->hitbox.height + 0.01;
-	// 				y_vel = 0;
-	// 				return true;
-	// 			}
-	// 		}
-
-	// 		if (pos.y + hitbox.height > platform->hitbox.y && pos.y < platform->hitbox.y + platform->hitbox.height) { // check for x collisions when isnt atop platforms y axis and isnt below platforms y axis
-	// 			// if (pos.x != prev_pos.x) { // both dirs
-	// 			// 	pos.x = prev_pos.x;
-	// 			// 	x_vel = 0;
-	// 			// }
-	// 			if (pos.x > prev_pos.x) {
-	// 				// pos.x = platform->hitbox.x - hitbox.width - 0.01;
-	// 				// pos.x = platform->hitbox.x - hitbox.width;
-	// 				pos.x = prev_pos.x;
-	// 				x_vel = 0;
-	// 				// x_vel = -x_vel;
-	// 			}
-	// 			else if (pos.x < prev_pos.x) {
-	// 				// pos.x = platform->hitbox.x + platform->hitbox.width + 0.01;
-	// 				// pos.x = platform->hitbox.x + platform->hitbox.width;
-	// 				pos.x = prev_pos.x;
-	// 				x_vel = 0;
-	// 				// x_vel = -x_vel;
-	// 			}
-	// 		}
-	// 		return true;
-	// 	}
-	// 	return false;
-	// };
-
 	void standing_on_moving_platform_update (Platform *platform) 
 	{
 			// if (platform->vel.x != 0 && within_x) { pos.x += platform->vel.x * GetFrameTime(); /* prev_pos.x = pos.x; */ } // moving platforms update
@@ -262,20 +157,6 @@ public:
 
 	bool collision_resolution_v2 (Platform *platform, int index) {
 		if (CheckCollisionRecs(hitbox, platform->hitbox)) {
-
-			// a1 > b1
-			// a1 > b2
-			// a2 < b1
-			// a2 < b2
-
-			// ts function broken xd
-			// bool within_x = is_in_range(
-			// 	platform->hitbox.x,
-			// 	platform->hitbox.x + platform->hitbox.width,
-			// 	prev_pos.x,
-			// 	prev_pos.x + hitbox.width
-			// );
-			// repeat:
 
 			bool within_x; if (
 				platform->hitbox.x > prev_pos.x
@@ -315,17 +196,8 @@ public:
 				}
 			}
 
-			// if (platform->vel.x < 0 && platform->hitbox.x > hitbox.x + hitbox.width) { pos.x = platform->hitbox.x - hitbox.width - 1; return true; }
-			// else if (platform->vel.x > 0 && platform->hitbox.x < hitbox.x) { pos.x = platform->hitbox.x + platform->hitbox.width + 1; return true; }
-
-			// if (platform->vel.x < 0 && x_vel >= 0) { pos.x = platform->hitbox.x - hitbox.width - 1; /*return true;*/ }
-			// else if (platform->vel.x < 0 && x_vel >= 0) { pos.x = platform->hitbox.x - hitbox.width - 1; /*return true;*/ }
-
 			if (platform->vel.x < 0 && x_vel >= 0 && !within_x) { pos.x = platform->hitbox.x - hitbox.width - 1; /*return true;*/ } // moving platforms update
 			else if (platform->vel.x > 0 && x_vel <= 0 && !within_x) { pos.x = platform->hitbox.x + platform->hitbox.width + 1; /* return true; */ } // moving platforms update
-			// if (platform->vel.x < 0 && x_vel >= 0 && !within_x) { pos.x = platform->hitbox.x - hitbox.width - platform->vel.x * GetFrameTime(); } // moving platforms update
-			// else if (platform->vel.x > 0 && x_vel <= 0 && !within_x) { pos.x = platform->hitbox.x + platform->hitbox.width + platform->vel.x * GetFrameTime(); } // moving platforms update
-			// else if (platform->vel.x != 0 && within_x) { pos.x += platform->vel.x * GetFrameTime(); /* prev_pos.x = pos.x; */ } // moving platforms update
 			else if (prev_pos.x != pos.x && !within_x) { 
 				pos.x = prev_pos.x;
 				x_vel = 0;
@@ -364,7 +236,6 @@ public:
 
 	}
 
-	// void collision_detection (Platform *platforms) {
 	void collision_detection (std::vector<Platform> &platforms) {
 		std::vector< std::pair<int, float> > possible_collisions_list;
 		for (unsigned int i = 0; i < std::size(platforms); i++) {
@@ -380,15 +251,9 @@ public:
 		);
 		bool collision_frame = false;
 
-		// int index;
 		for (auto i : possible_collisions_list) {
-			// cool_collision_detection(&platforms[i.first]);
-			// if (cool_collision_detection(&platforms[i.first])) collision_frame = true;
 			if (collision_resolution_v2(&platforms[i.first], i.first)) collision_frame = true;
-			// index++;
 		}
-		// if (collision_frame) puts("collision frame");
-		// else puts(".");
 	}
 
 	void animate_from_to_frame (int from, int to, int speed)
@@ -479,10 +344,6 @@ int main ()
 
 		frame++;
 
-		// if (IsKeyPressed(KEY_Q)) { 
-		// 	CloseWindow();
-		// 	CloseAudioDevice();
-		// }
 		if (IsKeyPressed(KEY_R)) { player.pos.x = 700; player.pos.y = 100;
 							 player.prev_pos.x = 700; player.prev_pos.y = 100; }
 
@@ -515,37 +376,6 @@ int main ()
 	
 		// player.truly_grounded_counter = 1;
 		// player.update_pos();
-
-		// {  // COLLISIONS
-		// 	// std::vector<Platform> possible_collisions_list;
-		// 	// std::vector< std::pair<Platform, float> > possible_collisions_list;
-		// 	std::vector< std::pair<int, float> > possible_collisions_list;
-		// 	// for (auto i : platforms) {
-		// 	for (unsigned int i = 0; i < size(platforms); i++) {
-		// 		// if (CheckCollisionRecs(player.scanbox, i.hitbox)) possible_collisions_list.push_back(i);
-		// 		platforms[i].color = WHITE;
-		// 		if (CheckCollisionRecs(player.scanbox, platforms[i].hitbox)) { possible_collisions_list.push_back( {i, player.distance_from_player( &platforms[i])} ); platforms[i].color = BLUE; }
-		// 		// if (CheckCollisionRecs(player.scanbox, platforms[i].hitbox)) possible_collisions_list.push_back( {i, 3} );
-		// 	}
-		// 	std::sort(possible_collisions_list.begin(), possible_collisions_list.end(),
-		// 			[](
-		// 				const std::pair<int, float> &a,
-		// 				const std::pair<int, float> &b
-		// 			) 
-		// 			{ return a.second < b.second; }
-		// 	);
-		// 	// if (!possible_collisions_list.empty()) { 
-		// 	// 	std::cout << possible_collisions_list[0].first << "\n"; platforms[possible_collisions_list[0].first].color = RED;
-		// 	// }
-		// 	// printf("size of possible_collisions_list: %d\n", size(possible_collisions_list));
-		// 	// std::cout << possible_collisions_list.front() << "\n";
-		// 	// std::cout << "bocchi kita" << "\n";
-		// 	// printf("nearest rect: %d\n", possible_collisions_list[0].first);
-		// 	// for (auto i : possible_collisions_list) {
-		// 	for (auto i : possible_collisions_list) {
-		// 		player.cool_collision_detection(&platforms[i.first]);
-		// 	}
-		// }
 
 		if (player.is_grounded) player.coyote = 8;
 		else if (player.coyote && !player.is_grounded) player.coyote--;
