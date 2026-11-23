@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <math.h>
@@ -65,6 +66,8 @@ void rectangle_remove (int index)
 void load_rectangles (char *file_path)
 {
 	FILE *f = fopen(file_path, "r");
+	if (f == NULL) { printf("file \"%s\" doesnt exist\n", file_path); exit(EXIT_FAILURE); }
+	if (strstr(file_path, ".lesbian") == NULL) { printf("file \"%s\" isn't of \".lesbian\" file type.\n", file_path); exit(EXIT_FAILURE); }
 
 	char sign = fgetc(f);
 	while (sign != EOF) {
@@ -74,6 +77,18 @@ void load_rectangles (char *file_path)
 			rectangle_append(tmp);
 		}
 		sign = fgetc(f);
+	}
+
+	fclose(f);
+}
+
+void save_rectangles (char *file_path)
+{
+	FILE *f = fopen(file_path, "w");
+
+	for (int i = 0; i < all_recs.size; i++) {
+		Rectangle tmp = all_recs.item[i];
+		fprintf(f, "{%f, %f, %f, %f}\n", tmp.x, tmp.y, tmp.width, tmp.height);
 	}
 
 	fclose(f);
@@ -213,7 +228,7 @@ void draw_grid (void)
 }
 
 int selected_rec = -1;
-int main (void)
+int main (int argc, char *argv[])
 {
 	InitWindow(1000, 800, "girls kissing level editor!!");
 	// GuiEnable();
@@ -239,7 +254,8 @@ int main (void)
 	Rectangle rec_to_add = {0};
 	int mode = 0;
 
-	load_rectangles("./level-1");
+	if (argc == 1) { puts("no level files provided"); exit(EXIT_SUCCESS); }
+	load_rectangles(argv[1]);
 
 	while (!WindowShouldClose()) {
 		// if (IsKeyDown(KEY_ESCAPE)) CloseWindow();
@@ -280,37 +296,59 @@ int main (void)
 		}
 
 		// DrawRectangleRec(rec_to_add, (Color){0x22, 0x77, 0x22, 0xcc});
-		if (IsKeyPressed(KEY_DELETE) && selected_rec != -1) {
+		if (( IsKeyPressed(KEY_DELETE) && selected_rec != -1 ) || ( IsKeyPressed(KEY_H) && selected_rec != -1 )) {
 			rectangle_remove(selected_rec);
 			selected_rec = -1;
 		}
 
 		if (mode == 1 && selected_rec != -1) {
-			if (IsKeyDown(KEY_LEFT_CONTROL)) {
-				// increase rectangle size
-				if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].height += 1; all_recs.item[selected_rec].y -= 1; }
-				if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].height += 1; }
-				if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].width += 1; all_recs.item[selected_rec].x -= 1; }
-				if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].width += 1; }
-			} else if (IsKeyDown(KEY_LEFT_ALT)) {
-				// decrease rectangle size
-				if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].height -= 1; }
-				if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].height -= 1; all_recs.item[selected_rec].y += 1; }
-				if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].width -= 1;  }
-				if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].width -= 1; all_recs.item[selected_rec].x += 1; }
+			if (IsKeyDown(KEY_LEFT_SHIFT)) {
+				if (IsKeyDown(KEY_LEFT_CONTROL)) {
+					// increase rectangle size
+					if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].height += 10; all_recs.item[selected_rec].y -= 10; }
+					if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].height += 10; }
+					if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].width += 10; all_recs.item[selected_rec].x -= 10; }
+					if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].width += 10; }
+				} else if (IsKeyDown(KEY_LEFT_ALT)) {
+					// decrease rectangle size
+					if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].height -= 10; }
+					if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].height -= 10; all_recs.item[selected_rec].y += 10; }
+					if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].width -= 10;  }
+					if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].width -= 10; all_recs.item[selected_rec].x += 10; }
+				} else {
+					// move rectangle
+					if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].y -= 10; }
+					if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].y += 10; }
+					if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].x -= 10; }
+					if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].x += 10; }
+				}
 			} else {
-				// move rectangle
-				if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].y -= 1; }
-				if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].y += 1; }
-				if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].x -= 1; }
-				if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].x += 1; }
+				if (IsKeyDown(KEY_LEFT_CONTROL)) {
+					// increase rectangle size
+					if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].height += 1; all_recs.item[selected_rec].y -= 1; }
+					if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].height += 1; }
+					if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].width += 1; all_recs.item[selected_rec].x -= 1; }
+					if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].width += 1; }
+				} else if (IsKeyDown(KEY_LEFT_ALT)) {
+					// decrease rectangle size
+					if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].height -= 1; }
+					if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].height -= 1; all_recs.item[selected_rec].y += 1; }
+					if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].width -= 1;  }
+					if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].width -= 1; all_recs.item[selected_rec].x += 1; }
+				} else {
+					// move rectangle
+					if (IsKeyPressed(KEY_W)) { all_recs.item[selected_rec].y -= 1; }
+					if (IsKeyPressed(KEY_S)) { all_recs.item[selected_rec].y += 1; }
+					if (IsKeyPressed(KEY_A)) { all_recs.item[selected_rec].x -= 1; }
+					if (IsKeyPressed(KEY_D)) { all_recs.item[selected_rec].x += 1; }
+				}
 			}
 		}
 
 		if ( ( mode == 0 && IsKeyPressed(KEY_R) ) || ( mode == 0 && IsKeyPressed(KEY_ESCAPE) ) ) {
 			rec_to_add = (Rectangle){0};
 		}
-		if (mode == 1 && IsKeyPressed(KEY_R)) {
+		if ( ( mode == 1 && IsKeyPressed(KEY_R) ) || ( mode == 1 && IsKeyPressed(KEY_ESCAPE) ) ) {
 			selected_rec = -1;
 		}
 
@@ -393,6 +431,7 @@ int main (void)
 		// printf("x %f y %f w %f h %f\n\n", new.x, new.y, new.width, new.height);
 	}
 
+	save_rectangles(argv[1]);
 	CloseWindow();
 
 	return 0;

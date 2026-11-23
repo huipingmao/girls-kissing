@@ -45,16 +45,17 @@ class Player {
 private:
 	char my_email[16] = "joe@mail.com";
 public:
-	Vector2 pos = (Vector2) {100, 100};
+	Vector2 pos = (Vector2) {0, 0};
 	Vector2 prev_pos = pos;
 	Vector2 vel;
 	float x_vel = 0;
 	float y_vel = 0;
 	float max_speed = 155;
 	float acceleration = 5;
-	float jump_height = 600;
+	// float jump_height = 600;
+	float jump_height = 525;
 	float gravity_accel = 20;
-	float gravity_max = 800;
+	float gravity_max = 700;
 	int health = 1;
 	int coyote = 0;
 	int animation_time = 0;
@@ -289,6 +290,7 @@ int main ()
 	Texture2D grass = LoadTexture("resources/sprites/grass.png");
 	Texture2D tree = LoadTexture("resources/sprites/tree.png");
 	Texture2D sunflower = LoadTexture("resources/sprites/sunflower.png");
+	Texture2D background = LoadTexture("resources/sprites/background.png");
 
 	// Sound sound[5] = {0};
 	// sound[0] = LoadSound("resources/sfx/stereotypical-japanese-pop.mp3");
@@ -307,34 +309,34 @@ int main ()
 
 	std::vector<Platform> platforms;
 
-	// read_level_file("./level-1", &platforms);
+	read_level_file("./level-1.lesbian", &platforms);
 
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){800, 300, 300, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){300, 450, 300, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 600, 300, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 250, 30, 300}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 700, 300, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){800, 300, 300, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){300, 450, 300, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 600, 300, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){500, 250, 30, 300}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 700, 300, 30}, nijika});
 
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 600, 30, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 610, 30, 30}, nijika});
-	// platforms.push_back({(Vector2) {0, 0}, (Platform)(Rectangle){80, 601, 30, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 500, 30, 30}, nijika});
-	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 550, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 300, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){320, 200, 30, 300}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 730, 9900, 10}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1200, 600, 200, 10}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1400, 600, 200, 10}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1620, 600, 200, 10}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){4000, 200, 5, 1000}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2000, 600, 300, 20}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2100, 600, 300, 20}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2200, 600, 300, 20}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2500, 600, 300, 20}, nijika});
+	// // platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){20, 600, 30, 30}, nijika});
+	// // platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 610, 30, 30}, nijika});
+	// // platforms.push_back({(Vector2) {0, 0}, (Platform)(Rectangle){80, 601, 30, 30}, nijika});
+	// // platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){70, 500, 30, 30}, nijika});
+	// // platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 550, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 300, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){320, 200, 30, 300}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){100, 730, 9900, 10}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1200, 600, 200, 10}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1400, 600, 200, 10}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){1620, 600, 200, 10}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){4000, 200, 5, 1000}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2000, 600, 300, 20}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2100, 600, 300, 20}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2200, 600, 300, 20}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 0}, (Rectangle){2500, 600, 300, 20}, nijika});
 
-	platforms.push_back((Platform){(Vector2) {0, -5}, (Rectangle){100, 550, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {0, 5}, (Rectangle){70, 500, 30, 30}, nijika});
-	platforms.push_back((Platform){(Vector2) {-10, 0}, (Rectangle){240, 600, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, -5}, (Rectangle){100, 550, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {0, 5}, (Rectangle){70, 500, 30, 30}, nijika});
+	// platforms.push_back((Platform){(Vector2) {-10, 0}, (Rectangle){240, 600, 30, 30}, nijika});
 
 	float camera_x_follow = player.pos.x + player.hitbox.width / 2;
 	float camera_y_follow = player.pos.y + player.hitbox.height / 2;
@@ -344,11 +346,11 @@ int main ()
 
 		frame++;
 
-		if (IsKeyPressed(KEY_R)) { player.pos.x = 700; player.pos.y = 100;
-							 player.prev_pos.x = 700; player.prev_pos.y = 100; }
+		if (IsKeyPressed(KEY_R)) { player.pos.x = 0; player.pos.y = 0;
+							 player.prev_pos.x = 0; player.prev_pos.y = 0; }
 
-		if (player.pos.y > 1200) { player.pos.x = 700; player.pos.y = 100; // tmp
-							 player.prev_pos.x = 700; player.prev_pos.y = 100; }
+		// if (player.pos.y > 1200) { player.pos.x = 700; player.pos.y = 100; // tmp
+		// 					 player.prev_pos.x = 700; player.prev_pos.y = 100; }
 
 		char dir = ' ';
 		if (IsKeyPressed(KEY_A)) player.facing = 'l';
@@ -377,17 +379,51 @@ int main ()
 		// player.truly_grounded_counter = 1;
 		// player.update_pos();
 
-		if (player.is_grounded) player.coyote = 8;
-		else if (player.coyote && !player.is_grounded) player.coyote--;
+		// if (player.is_grounded) player.coyote = 8;
+		// else if (player.coyote && !player.is_grounded) player.coyote--;
+		// if (player.is_truly_grounded) player.coyote = 8;
+		// 
+		// if (player.is_grounded) player.coyote = 100;
+		// if (!player.is_truly_grounded) player.coyote = 100;
+		// else if (player.coyote && !player.is_truly_grounded) player.coyote--;
+		// if (player.coyote) player.coyote--;
 
+		// if (player.gravity_accel != 20) player.gravity_accel += 0.2;
+		// if (player.gravity_accel > 20 || player.gravity_accel < 0) player.gravity_accel = 20;
+		// if (!player.is_grounded && !player.coyote) { player.gravity(); }
+		// if (!player.coyote) player.gravity();
+		// if (player.coyote) player.is_grounded = true;
+ 
+		// if (IsKeyReleased(KEY_SPACE)) { player.can_jump = true; }
+		// if (IsKeyDown(KEY_SPACE) && player.is_grounded && player.can_jump || IsKeyDown(KEY_SPACE) && player.coyote && player.can_jump) { 
+		// 	player.jump(); player.is_grounded = false; player.coyote = 0; 
+		// 	if (player.facing == 'r') player.animation_frame = 2;
+		// 	// PlaySound(sound[std::rand() % (0 - 5)]);
+		// 	// else player.animation_frame = 3;
+		// 	// PlaySound(sound[2]);
+		// 	// PlaySound(sound[4]);
+		// 	// PlaySound(sound[0]);
+		// 	// PlaySound(sound);
+		// 	player.gravity_accel = 0;
+		// }
+
+		// if (player.coyote) player.coyote--;
 		if (player.gravity_accel != 20) player.gravity_accel += 0.2;
 		if (player.gravity_accel > 20 || player.gravity_accel < 0) player.gravity_accel = 20;
-		if (!player.is_grounded) { player.gravity(); }
  
+		// if (player.is_grounded && player.can_jump) player.coyote = 100;
+		if (player.is_grounded && player.can_jump) player.coyote = 8;
+		else player.coyote--;
+		if (!player.is_grounded) player.gravity();
+		if (player.coyote < 0) player.coyote = 0;
+
 		if (IsKeyReleased(KEY_SPACE)) { player.can_jump = true; }
-		if (IsKeyDown(KEY_SPACE) && player.is_grounded && player.can_jump || IsKeyDown(KEY_SPACE) && player.coyote && player.can_jump) { 
-			player.jump(); player.is_grounded = false; player.coyote = 0; 
-			if (player.facing == 'r') player.animation_frame = 2;
+		if (IsKeyDown(KEY_SPACE) && player.is_truly_grounded && player.can_jump || IsKeyDown(KEY_SPACE) && player.coyote && player.can_jump) { 
+			player.y_vel = 0; 
+			player.jump();
+			player.is_grounded = false;
+			player.coyote = 0; 
+			// if (player.facing == 'r') player.animation_frame = 2;
 			// PlaySound(sound[std::rand() % (0 - 5)]);
 			// else player.animation_frame = 3;
 			// PlaySound(sound[2]);
@@ -406,27 +442,30 @@ int main ()
 		if (camera_x_follow < player.pos.x + player.hitbox.width / 2 - 20) camera_x_follow = player.pos.x + player.hitbox.width / 2 - 20;
 		if (camera_x_follow > player.pos.x + player.hitbox.width / 2 + 20) camera_x_follow = player.pos.x + player.hitbox.width / 2 + 20;
 
-		if (camera_y_follow < player.prev_pos.y + player.hitbox.height / 2 + 80) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 + 80;
-		if (camera_y_follow > player.prev_pos.y + player.hitbox.height / 2 - 35) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 - 35;
+		// if (camera_y_follow < player.pos.y + player.hitbox.height / 2 - 40) camera_y_follow += 1;
 		// if (camera_y_follow > player.pos.y + player.hitbox.height / 2 - 40) camera_y_follow -= 1;
+		// if (camera_y_follow < player.prev_pos.y + player.hitbox.height / 2 + 100) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 + 100;
+		// if (camera_y_follow > player.prev_pos.y + player.hitbox.height / 2 - 100) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 - 100;
 
-		// if (camera_y_follow < player.pos.y + player.hitbox.height / 2 - 60) camera_y_follow = player.pos.y + player.hitbox.height / 2 - 60;
-		// if (camera_y_follow > player.pos.y + player.hitbox.height/ 2 + 60) camera_y_follow = player.pos.y + player.hitbox.height / 2 + 60;
+		if (camera_y_follow < player.pos.y + player.hitbox.height / 2 - 40) camera_y_follow += 2;
+		if (camera_y_follow < player.pos.y + player.hitbox.height / 2 - 60) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 - 60;
+		if (camera_y_follow > player.pos.y + player.hitbox.height / 2 + 60) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 + 60;
 		// camera.target = (Vector2) {camera_x_follow, 400};
-		// camera.target = (Vector2) {camera_x_follow, player.prev_pos.y};
-		// camera.target = (Vector2) {camera_x_follow, player.prev_pos.y};
-		camera.target = (Vector2) {camera_x_follow, camera_y_follow};
+		camera.target = (Vector2) {camera_x_follow, player.pos.y + 30};
+		// camera.target = (Vector2) {camera_x_follow, camera_y_follow};
 		camera.offset = (Vector2){ GetRenderWidth()/2.0f, GetRenderHeight()/2.0f };
 		camera.rotation = 0.0f;
-		camera.zoom = 3.0f;
+		// camera.zoom = 3.0f;
+		camera.zoom = 2.0f;
 		// camera.zoom = 9.0f;
 
 		BeginDrawing();
 
+		DrawTexturePro(background, (Rectangle){0, 0, 1920, 1200}, (Rectangle){0, 0, (float)GetRenderWidth(), (float)GetRenderHeight()}, (Vector2){0, 0}, 0, WHITE);
 		BeginMode2D(camera);
 		// ClearBackground(Color{0x11, 0x00, 0x11, 0xff});
 		// ClearBackground(Color{0xa5, 0xc2, 0xd6, 0xff});
-		ClearBackground(Color{0x00, 0x00, 0x00, 0xff});
+		// ClearBackground(Color{0x00, 0x00, 0x00, 0xff});
 
 		// DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {100, 530, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, -2, WHITE);
 		// DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {180, 535, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, 3, WHITE);
@@ -458,12 +497,13 @@ int main ()
 		for (auto i : platforms) {
 			// DrawRectangleRec(i.hitbox, i.color);
 			platforms[asdlkf].update_platform_pos();
-			DrawRectangleRec(i.hitbox, Color{0x87, 0x67, 0x60, 0xff});
+			// DrawRectangleRec(i.hitbox, Color{0x87, 0x67, 0x60, 0xff});
+			DrawRectangleRec(i.hitbox, Color{0xff, 0xff, 0xff, 0xaa});
 			// DrawRectangleRec(i.hitbox, Color{0xaa, 0x67, 0xc2, 0xff});
 			// DrawTexturePro(i.texture, (Rectangle) {0, 0, i.hitbox.width, i.hitbox.height}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
 			// DrawTexturePro(grass, (Rectangle) {0, 0, i.hitbox.width * 10, i.hitbox.height * 10}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
-			DrawTextEx(mona, TextFormat("%d %.1f %.1f\n", asdlkf, i.hitbox.x, i.hitbox.y), (Vector2){ i.hitbox.x, i.hitbox.y }, (float)mona.baseSize, 1, BLUE);
-			DrawTextEx(mona, TextFormat("%.1f %.1f\n", i.vel.x, i.vel.y), (Vector2){ i.hitbox.x, i.hitbox.y + 20 }, (float)mona.baseSize, 1, BLUE);
+			// DrawTextEx(mona, TextFormat("%d %.1f %.1f\n", asdlkf, i.hitbox.x, i.hitbox.y), (Vector2){ i.hitbox.x, i.hitbox.y }, (float)mona.baseSize, 1, BLUE);
+			// DrawTextEx(mona, TextFormat("%.1f %.1f\n", i.vel.x, i.vel.y), (Vector2){ i.hitbox.x, i.hitbox.y + 20 }, (float)mona.baseSize, 1, BLUE);
 			asdlkf++;
 		}
 
