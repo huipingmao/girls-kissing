@@ -50,7 +50,8 @@ public:
 	Vector2 vel;
 	float x_vel = 0;
 	float y_vel = 0;
-	float max_speed = 155;
+	// float max_speed = 155;
+	float max_speed = 200;
 	float acceleration = 5;
 	// float jump_height = 600;
 	float jump_height = 525;
@@ -61,6 +62,7 @@ public:
 	int animation_time = 0;
 	int animation_frame = 0;
 	int animation_count = 0;
+	bool animation_forward = true;
 	// int idle_animation_frame = 0;
 	// bool odd_frame = false;
 	bool in_air = false;
@@ -261,7 +263,7 @@ public:
 	{
 		// if (animation_time <= 0) { animation_time = 60;}
 		// else animation_time--;
-
+		animation_forward = true;
 		animation_time -= speed;
 		if (animation_time <= 0) animation_frame++;
 		if (animation_frame < from || animation_frame > to) { 
@@ -271,9 +273,27 @@ public:
 		else if (animation_time > 0) return;
 
 	};
+
+	void animate_ping_pong (int from, int to, int speed)
+	{
+		animation_time -= speed;
+		// if (animation_time <= 0) animation_frame++;
+
+		if (animation_frame <= from) { animation_frame = from; animation_forward = true; }
+		if (animation_frame >= to) { animation_frame = to; animation_forward = false; }
+
+		if (animation_time > 0) return;
+		if (animation_time <= 0 && animation_forward) animation_frame++;
+		else if (animation_time <= 0) animation_frame--;
+		// if (animation_frame < to) { animation_forward = true; animation_frame++;  return; }
+		// if (animation_frame > to) { animation_forward = true; animation_frame++;  return; }
+		// if (animation_frame > from) { animation_forward = false; animation_frame--; animation_frame = from; return; }
+	};
 };
 
 int frame = 0;
+int global_animation_time = 0;
+int global_animation = 0;
 
 int main ()
 {
@@ -285,12 +305,13 @@ int main ()
 
 	Font mona = LoadFontEx("resources/MonaspaceRadonFrozen-Regular.ttf", 20, 0, 250);
 	// Texture2D girls_kissing = LoadTexture("resources/sprites/bokita.png");
-	Texture2D kita_idle = LoadTexture("resources/sprites/kita-all.png");
+	Texture2D kita_idle = LoadTexture("resources/sprites/kita-new.png");
 	Texture2D nijika = LoadTexture("resources/sprites/nijika.gif");
 	Texture2D grass = LoadTexture("resources/sprites/grass.png");
 	Texture2D tree = LoadTexture("resources/sprites/tree.png");
 	Texture2D sunflower = LoadTexture("resources/sprites/sunflower.png");
-	Texture2D background = LoadTexture("resources/sprites/background.png");
+	// Texture2D background = LoadTexture("resources/sprites/background.png");
+	Texture2D background = LoadTexture("resources/sprites/sky2.png");
 
 	// Sound sound[5] = {0};
 	// sound[0] = LoadSound("resources/sfx/stereotypical-japanese-pop.mp3");
@@ -345,6 +366,8 @@ int main ()
 	while (!WindowShouldClose()) {
 
 		frame++;
+		if (global_animation_time <= 0) { global_animation++; global_animation_time = 240; }
+		global_animation_time--;
 
 		if (IsKeyPressed(KEY_R)) { player.pos.x = 0; player.pos.y = 0;
 							 player.prev_pos.x = 0; player.prev_pos.y = 0; }
@@ -437,37 +460,41 @@ int main ()
 
 		player.update_pos();
 
-		// if (camera_x_follow < player.pos.x + player.hitbox.width / 2 - 60) camera_x_follow = player.pos.x + player.hitbox.width / 2 - 60;
-		// if (camera_x_follow > player.pos.x + player.hitbox.width / 2 + 60) camera_x_follow = player.pos.x + player.hitbox.width / 2 + 60;
 		if (camera_x_follow < player.pos.x + player.hitbox.width / 2 - 20) camera_x_follow = player.pos.x + player.hitbox.width / 2 - 20;
 		if (camera_x_follow > player.pos.x + player.hitbox.width / 2 + 20) camera_x_follow = player.pos.x + player.hitbox.width / 2 + 20;
 
-		// if (camera_y_follow < player.pos.y + player.hitbox.height / 2 - 40) camera_y_follow += 1;
-		// if (camera_y_follow > player.pos.y + player.hitbox.height / 2 - 40) camera_y_follow -= 1;
-		// if (camera_y_follow < player.prev_pos.y + player.hitbox.height / 2 + 100) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 + 100;
-		// if (camera_y_follow > player.prev_pos.y + player.hitbox.height / 2 - 100) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 - 100;
 
-		if (camera_y_follow < player.pos.y + player.hitbox.height / 2 - 40) camera_y_follow += 2;
-		if (camera_y_follow < player.pos.y + player.hitbox.height / 2 - 60) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 - 60;
-		if (camera_y_follow > player.pos.y + player.hitbox.height / 2 + 60) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 + 60;
-		// camera.target = (Vector2) {camera_x_follow, 400};
-		camera.target = (Vector2) {camera_x_follow, player.pos.y + 30};
-		// camera.target = (Vector2) {camera_x_follow, camera_y_follow};
+		if (camera_y_follow < player.pos.y + player.hitbox.height / 2 - 80) camera_y_follow = player.pos.y + player.hitbox.height / 2 - 80; // camera dohn
+		else if (camera_y_follow < player.pos.y + player.hitbox.height / 2 - 40) camera_y_follow +=1 ; // camera dohn
+		else if (player.is_truly_grounded && camera_y_follow < player.pos.y + player.hitbox.height / 2 - 30) camera_y_follow += 1; // camera down
+
+		else if (camera_y_follow > player.pos.y + player.hitbox.height / 2 + 100) camera_y_follow = player.prev_pos.y + player.hitbox.height / 2 + 100 - 1; // camera up
+		else if (player.is_truly_grounded && camera_y_follow > player.pos.y + player.hitbox.height / 2 + 20) camera_y_follow -= 1; // camera up
+		else if (camera_y_follow > player.pos.y + player.hitbox.height / 2 + 80) camera_y_follow -= 1; // camera up
+
+
+
+		// camera.target = (Vector2) {camera_x_follow, player.pos.y + 30};
+		camera.target = (Vector2) {camera_x_follow, camera_y_follow};
 		camera.offset = (Vector2){ GetRenderWidth()/2.0f, GetRenderHeight()/2.0f };
 		camera.rotation = 0.0f;
-		// camera.zoom = 3.0f;
-		camera.zoom = 2.0f;
-		// camera.zoom = 9.0f;
+		camera.zoom = 3.0f;
+
+		if (IsKeyDown(KEY_C)) camera.zoom = 2.0f;
 
 		BeginDrawing();
 
-		DrawTexturePro(background, (Rectangle){0, 0, 1920, 1200}, (Rectangle){0, 0, (float)GetRenderWidth(), (float)GetRenderHeight()}, (Vector2){0, 0}, 0, WHITE);
+		// DrawTexturePro(background, (Rectangle){0, 0, 1920, 1200}, (Rectangle){0, 0, (float)GetRenderWidth(), (float)GetRenderHeight()}, (Vector2){0, 0}, 0, WHITE);
+		// DrawTexturePro(background, (Rectangle){0, 0, 7762, 5177}, (Rectangle){0, 0, (float)GetRenderWidth(), (float)GetRenderHeight()}, (Vector2){0, 0}, 0, WHITE);
+		// DrawTexturePro(background, (Rectangle){0, 0, 1470, 980}, (Rectangle){0, 0, (float)GetRenderWidth(), (float)GetRenderHeight()}, (Vector2){0, 0}, 0, WHITE);
+		DrawTexturePro(background, (Rectangle){0, 0, 1470, 980}, (Rectangle){0, 0, (float)GetRenderWidth(), (float)GetRenderHeight()}, (Vector2){0, 0}, 0, WHITE);
 		BeginMode2D(camera);
 		// ClearBackground(Color{0x11, 0x00, 0x11, 0xff});
 		// ClearBackground(Color{0xa5, 0xc2, 0xd6, 0xff});
 		// ClearBackground(Color{0x00, 0x00, 0x00, 0xff});
 
-		// DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {100, 530, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, -2, WHITE);
+		DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {140, -280, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, -2, WHITE);
+		DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {98, -134, 841 / 8, 1032 / 8}, (Vector2) {0, 0}, -6, WHITE);
 		// DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {180, 535, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, 3, WHITE);
 		// DrawTexturePro(tree, (Rectangle) {0, 0, 841, 1032}, (Rectangle) {300, 570, 841 / 6, 1032 / 6}, (Vector2) {0, 0}, -1, WHITE);
 		// DrawTexturePro(sunflower, (Rectangle) {0, 0, 802, 980}, (Rectangle) {280, 660, 802 / 20, 980 / 20}, (Vector2) {0, 0}, 3, WHITE);
@@ -478,12 +505,16 @@ int main ()
 		// DrawRectangleRec(player.scanbox, Color{0x00, 0xcc, 0x00, 0x44});
 		// DrawRectangleRec(player.hurtbox, Color{0xcc, 0x00, 0x00, 0x88});
 
-		if (player.animation_time <= 0) { player.animation_time = 80;}
+		if (player.animation_time <= 0) { player.animation_time = 120;}
 		else player.animation_time--;	
-		if (player.x_vel != 0 && player.y_vel >= 0) {
-			if (player.facing == 'r') player.animate_from_to_frame(4, 7, 0);
-			if (player.facing == 'l') player.animate_from_to_frame(8, 11, 0);
-		} else if (player.y_vel < 0) {
+		// if (player.x_vel != 0 && player.y_vel >= 0) {
+		if (player.x_vel != 0 && player.is_truly_grounded) {
+			// if (player.facing == 'r') player.animate_from_to_frame(4, 7, 2);
+			// if (player.facing == 'l') player.animate_from_to_frame(8, 11, 2);
+			if (player.facing == 'r') player.animate_ping_pong(4, 6, 2);
+			if (player.facing == 'l') player.animate_ping_pong(7, 9, 2);
+		// } else if (player.y_vel < 0) {
+		} else if (!player.is_truly_grounded) {
 			if (player.facing == 'r') player.animate_from_to_frame(2, 2, 0);
 			if (player.facing == 'l') player.animate_from_to_frame(3, 3, 0);
 		} else { 
@@ -498,10 +529,12 @@ int main ()
 			// DrawRectangleRec(i.hitbox, i.color);
 			platforms[asdlkf].update_platform_pos();
 			// DrawRectangleRec(i.hitbox, Color{0x87, 0x67, 0x60, 0xff});
-			DrawRectangleRec(i.hitbox, Color{0xff, 0xff, 0xff, 0xaa});
+			// DrawRectangleRec(i.hitbox, Color{0xff, 0xff, 0xff, 0xaa});
 			// DrawRectangleRec(i.hitbox, Color{0xaa, 0x67, 0xc2, 0xff});
 			// DrawTexturePro(i.texture, (Rectangle) {0, 0, i.hitbox.width, i.hitbox.height}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
-			// DrawTexturePro(grass, (Rectangle) {0, 0, i.hitbox.width * 10, i.hitbox.height * 10}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
+
+			DrawTexturePro(grass, (Rectangle) {0 + global_animation * 1000, 0 + -global_animation * 20, i.hitbox.width * 10, i.hitbox.height * 10}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
+
 			// DrawTextEx(mona, TextFormat("%d %.1f %.1f\n", asdlkf, i.hitbox.x, i.hitbox.y), (Vector2){ i.hitbox.x, i.hitbox.y }, (float)mona.baseSize, 1, BLUE);
 			// DrawTextEx(mona, TextFormat("%.1f %.1f\n", i.vel.x, i.vel.y), (Vector2){ i.hitbox.x, i.hitbox.y + 20 }, (float)mona.baseSize, 1, BLUE);
 			asdlkf++;

@@ -398,6 +398,7 @@ int main (int argc, char *argv[])
 		EndMode2D();
 
 		DrawTextEx(mona, TextFormat("rectangle number: %d\n", all_recs.size), (Vector2){ 1.0f, 1.0f }, (float)mona.baseSize, 2, GREEN); 
+		DrawTextEx(mona, TextFormat("file opened: \"%s\"\n", argv[1]), (Vector2){ 1.0f, 121.0f }, (float)mona.baseSize, 2, RED); 
 		DrawTextEx(mona, TextFormat("selected rec %d\n", selected_rec), (Vector2){ 1.0f, 21.0f }, (float)mona.baseSize, 2, GREEN); 
 
 		DrawTextEx(mona, TextFormat("(%.0f %.0f)", GetScreenToWorld2D(GetMousePosition(), camera).x, GetScreenToWorld2D(GetMousePosition(), camera).y), (Vector2){ GetMouseX(), GetMouseY() - 25}, (float)mona.baseSize, 2, WHITE); 
