@@ -396,8 +396,8 @@ int main ()
 		if (player.is_grounded) { player.is_truly_grounded = true; player.truly_grounded_counter = 1; }
 		else if (!player.is_grounded && player.truly_grounded_counter) { player.truly_grounded_counter--; }
 		else { player.is_truly_grounded = false; }
-		printf("player TRULY grounded %d\n", player.is_truly_grounded);
-		printf("platform that set..... %d\n", player.index_of_platform_that_set_true_grounded_state);
+		// printf("player TRULY grounded %d\n", player.is_truly_grounded);
+		// printf("platform that set..... %d\n", player.index_of_platform_that_set_true_grounded_state);
 	
 		// player.truly_grounded_counter = 1;
 		// player.update_pos();
@@ -479,6 +479,7 @@ int main ()
 		camera.offset = (Vector2){ GetRenderWidth()/2.0f, GetRenderHeight()/2.0f };
 		camera.rotation = 0.0f;
 		camera.zoom = 3.0f;
+		// camera.zoom = 1.0f;
 
 		if (IsKeyDown(KEY_C)) camera.zoom = 2.0f;
 
@@ -524,20 +525,31 @@ int main ()
 		// DrawRectangleRec(player.hitbox, RED);
 		// DrawTexturePro(player.texture, (Rectangle) {(float)player.animation_frame * 50, 0, 50, 140}, (Rectangle) {player.pos.x - 2.5f, player.pos.y, player.hitbox.width + 5, player.hitbox.height}, (Vector2) {0, 0}, 0, WHITE);
 
-		int asdlkf = 0;
-		for (auto i : platforms) {
-			// DrawRectangleRec(i.hitbox, i.color);
-			platforms[asdlkf].update_platform_pos();
-			// DrawRectangleRec(i.hitbox, Color{0x87, 0x67, 0x60, 0xff});
-			// DrawRectangleRec(i.hitbox, Color{0xff, 0xff, 0xff, 0xaa});
-			// DrawRectangleRec(i.hitbox, Color{0xaa, 0x67, 0xc2, 0xff});
-			// DrawTexturePro(i.texture, (Rectangle) {0, 0, i.hitbox.width, i.hitbox.height}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
 
-			DrawTexturePro(grass, (Rectangle) {0 + global_animation * 1000, 0 + -global_animation * 20, i.hitbox.width * 10, i.hitbox.height * 10}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
 
-			// DrawTextEx(mona, TextFormat("%d %.1f %.1f\n", asdlkf, i.hitbox.x, i.hitbox.y), (Vector2){ i.hitbox.x, i.hitbox.y }, (float)mona.baseSize, 1, BLUE);
-			// DrawTextEx(mona, TextFormat("%.1f %.1f\n", i.vel.x, i.vel.y), (Vector2){ i.hitbox.x, i.hitbox.y + 20 }, (float)mona.baseSize, 1, BLUE);
-			asdlkf++;
+		Rectangle cull = (Rectangle) {
+			player.pos.x + player.hitbox.width / 2 - GetRenderWidth() / 3, 
+			player.pos.y + player.hitbox.height / 2 - GetRenderHeight() / 3, 
+			GetRenderWidth() - GetRenderWidth() / 3,
+			GetRenderHeight() - GetRenderHeight() / 3
+		};
+		// DrawRectangleRec(cull, (Color) {255,0,0,100});
+		{
+			int index = 0;
+			for (auto i : platforms) {
+				// DrawRectangleRec(i.hitbox, i.color);
+				platforms[index].update_platform_pos();
+				// DrawRectangleRec(i.hitbox, Color{0x87, 0x67, 0x60, 0xff});
+				// DrawRectangleRec(i.hitbox, Color{0xff, 0xff, 0xff, 0xaa});
+				// DrawRectangleRec(i.hitbox, Color{0xaa, 0x67, 0xc2, 0xff});
+				// DrawTexturePro(i.texture, (Rectangle) {0, 0, i.hitbox.width, i.hitbox.height}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
+
+				if (CheckCollisionRecs(cull, i.hitbox)) DrawTexturePro(grass, (Rectangle) {0 + global_animation * 1000, 0 + -global_animation * 20, i.hitbox.width * 10, i.hitbox.height * 10}, i.hitbox, Vector2 {0, 0}, 0, WHITE);
+
+				// DrawTextEx(mona, TextFormat("%d %.1f %.1f\n", asdlkf, i.hitbox.x, i.hitbox.y), (Vector2){ i.hitbox.x, i.hitbox.y }, (float)mona.baseSize, 1, BLUE);
+				// DrawTextEx(mona, TextFormat("%.1f %.1f\n", i.vel.x, i.vel.y), (Vector2){ i.hitbox.x, i.hitbox.y + 20 }, (float)mona.baseSize, 1, BLUE);
+				index++;
+			}
 		}
 
 
